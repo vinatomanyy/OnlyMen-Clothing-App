@@ -4,19 +4,19 @@ A modern minimalist e-commerce Flutter app for men's clothing. Editorial/lookboo
 
 ## Features
 
-- 🛍️ Product catalog with size & color variant selection
-- 📖 Editorial lookbook with horizontal PageView
-- ❤️ Wishlist / Favorites (persisted locally)
-- 🗺️ Store locator with interactive map
-- 📍 Nearby stores with distance sorting
-- 🎟️ Promotions & coupon codes
-- 🛒 Cart & mock checkout
-- 📅 Personal styling appointment booking
-- 💬 Chat with stylist
-- ⭐ Reviews with fit feedback
-- 📸 Photo & video gallery
-- 🌙 Dark mode support
-- 📱 Responsive (phone + tablet)
+- Product catalog with size & color variant selection
+- Editorial lookbook with horizontal PageView
+- Wishlist / Favorites (persisted locally)
+- Store locator with interactive map
+- Nearby stores with distance sorting
+- Promotions & coupon codes
+- Cart & mock checkout
+- Personal styling appointment booking
+- Chat with stylist
+- Reviews with fit feedback
+- Photo & video gallery
+- Dark mode support
+- Responsive (phone + tablet)
 
 ## Tech Stack
 
@@ -29,5 +29,12 @@ A modern minimalist e-commerce Flutter app for men's clothing. Editorial/lookboo
 
 ## Setup
 
-1. Run `flutter pub get`
-2. Run `flutter run`
+1. Run the following command to install dependencies:
+```bash
+    flutter pub get
+```
+
+2. Run the app:
+```bash
+    flutter run
+```
