@@ -1,17 +1,33 @@
-# onlymen
+# OnlyMen — Men's Clothing Shop
 
-A new Flutter project.
+A modern minimalist e-commerce Flutter app for men's clothing. Editorial/lookbook style with a black, white, navy, and gold accent color palette.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- 🛍️ Product catalog with size & color variant selection
+- 📖 Editorial lookbook with horizontal PageView
+- ❤️ Wishlist / Favorites (persisted locally)
+- 🗺️ Store locator with interactive map
+- 📍 Nearby stores with distance sorting
+- 🎟️ Promotions & coupon codes
+- 🛒 Cart & mock checkout
+- 📅 Personal styling appointment booking
+- 💬 Chat with stylist
+- ⭐ Reviews with fit feedback
+- 📸 Photo & video gallery
+- 🌙 Dark mode support
+- 📱 Responsive (phone + tablet)
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Flutter 3.x / Dart 3.x / Material 3
+- State: Riverpod
+- Navigation: go_router
+- Backend: Supabase (PostgreSQL)
+- Local storage: shared_preferences
+- Map: flutter_map
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Setup
+
+1. Run `flutter pub get`
+2. Run `flutter run`
