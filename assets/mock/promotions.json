@@ -1,0 +1,47 @@
+[
+  {
+    "id": "promo001",
+    "title": "End of Season Sale",
+    "description": "Up to 30% off on selected jackets and outerwear. Limited time only.",
+    "code": "SEASON30",
+    "discount_percent": 30,
+    "expiry_date": "2026-12-31",
+    "image_url": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800"
+  },
+  {
+    "id": "promo002",
+    "title": "New Member Discount",
+    "description": "Welcome to OnlyMen. Enjoy 15% off your first order.",
+    "code": "WELCOME15",
+    "discount_percent": 15,
+    "expiry_date": "2026-12-31",
+    "image_url": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800"
+  },
+  {
+    "id": "promo003",
+    "title": "Weekend Flash Sale",
+    "description": "20% off all shirts and t-shirts this weekend only.",
+    "code": "WEEKEND20",
+    "discount_percent": 20,
+    "expiry_date": "2026-07-31",
+    "image_url": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800"
+  },
+  {
+    "id": "promo004",
+    "title": "Loyalty Reward",
+    "description": "Thank you for being a valued customer. Here's 10% off your next purchase.",
+    "code": "LOYAL10",
+    "discount_percent": 10,
+    "expiry_date": "2026-09-30",
+    "image_url": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800"
+  },
+  {
+    "id": "promo005",
+    "title": "Shoes & Accessories Bundle",
+    "description": "Buy any shoes and get 25% off accessories.",
+    "code": "BUNDLE25",
+    "discount_percent": 25,
+    "expiry_date": "2026-08-15",
+    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "b001",
+    "name": "OnlyMen — Phnom Penh Central",
+    "address": "Street 214, Daun Penh, Phnom Penh",
+    "lat": 11.5696,
+    "lng": 104.9210,
+    "phone": "+855 23 123 456",
+    "hours": "Mon–Sun: 10:00 AM – 9:00 PM",
+    "distance_km": 0.8
+  },
+  {
+    "id": "b002",
+    "name": "OnlyMen — Aeon Mall",
+    "address": "Aeon Mall Sen Sok, Phnom Penh",
+    "lat": 11.5800,
+    "lng": 104.8900,
+    "phone": "+855 23 456 789",
+    "hours": "Mon–Sun: 10:00 AM – 10:00 PM",
+    "distance_km": 3.2
+  },
+  {
+    "id": "b003",
+    "name": "OnlyMen — TK Avenue",
+    "address": "TK Avenue, Toul Kork, Phnom Penh",
+    "lat": 11.5750,
+    "lng": 104.9100,
+    "phone": "+855 23 789 012",
+    "hours": "Mon–Sun: 10:00 AM – 9:30 PM",
+    "distance_km": 4.5
+  }
+]
