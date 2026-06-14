@@ -80,9 +80,11 @@ final cartProvider = NotifierProvider<CartNotifier, List<CartItem>>(
 );
 
 final cartTotalProvider = Provider<double>((ref) {
-  return ref.watch(cartProvider.notifier).total;
+  final items = ref.watch(cartProvider);
+  return items.fold(0.0, (sum, item) => sum + (item.product.price * item.quantity));
 });
 
 final cartItemCountProvider = Provider<int>((ref) {
-  return ref.watch(cartProvider.notifier).itemCount;
+  final items = ref.watch(cartProvider);
+  return items.fold(0, (sum, item) => sum + item.quantity);
 });

@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/branch.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../widgets/shimmer_widgets.dart';
 
 class NearbyScreen extends StatefulWidget {
   const NearbyScreen({super.key});
@@ -19,6 +21,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
   bool _loading = true;
   int _selectedIndex = 0;
   bool _mapExpanded = true;
+  String _filter = 'All'; // All, Open Now, Nearest, Top Rated
 
   @override
   void initState() {
@@ -41,12 +44,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: _loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(color: AppColors.accent))
+          ? const ShimmerBranchList()
           : Column(
               children: [
                 // Map view
@@ -73,15 +74,17 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     ),
                   ),
                 ),
+                // Filter chips
+                _buildFilterChips(),
                 // Branch list
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    itemCount: _branches.length,
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: _filteredBranches.length,
                     itemBuilder: (_, i) => _BranchCard(
-                      branch: _branches[i],
-                      selected: i == _selectedIndex,
-                      onTap: () => setState(() => _selectedIndex = i),
+                      branch: _filteredBranches[i],
+                      selected: _filteredBranches[i] == (_selectedIndex < _branches.length ? _branches[_selectedIndex] : null),
+                      onTap: () => setState(() => _selectedIndex = _branches.indexOf(_filteredBranches[i])),
                     ),
                   ),
                 ),
@@ -90,17 +93,65 @@ class _NearbyScreenState extends State<NearbyScreen> {
     );
   }
 
+  List<Branch> get _filteredBranches {
+    final now = TimeOfDay.now();
+    final isOpen = (Branch b) => now.hour >= 10 && now.hour < 21;
+    switch (_filter) {
+      case 'Open Now':
+        return _branches.where(isOpen).toList();
+      case 'Nearest':
+        return [..._branches]..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+      case 'Top Rated':
+        return [..._branches]..sort((a, b) => b.distanceKm.compareTo(a.distanceKm));
+      default:
+        return _branches;
+    }
+  }
+
+  Widget _buildFilterChips() => SizedBox(
+        height: 44,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          children: ['All', 'Open Now', 'Nearest', 'Top Rated'].map((f) {
+            final selected = _filter == f;
+            return GestureDetector(
+              onTap: () => setState(() => _filter = f),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.accent : Colors.transparent,
+                  border: Border.all(
+                    color: selected ? AppColors.accent : AppColors.grey700,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  f,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: selected ? AppColors.black : AppColors.grey400,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      );
+
   AppBar _buildAppBar() => AppBar(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'NEARBY BOUTIQUES',
           style:
-              AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+              AppTextStyles.labelLarge.copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
         centerTitle: true,
         actions: [
@@ -187,7 +238,7 @@ class _MapPin extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 8, vertical: 3),
-              color: AppColors.black.withOpacity(0.8),
+              color: AppColors.black.withValues(alpha: 0.8),
               child: Text(
                 '${distKm}km',
                 style: AppTextStyles.bodySmall.copyWith(
@@ -202,7 +253,7 @@ class _MapPin extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
@@ -311,8 +362,8 @@ class _BranchCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       color: isOpen
-                          ? AppColors.success.withOpacity(0.15)
-                          : AppColors.error.withOpacity(0.15),
+                          ? AppColors.success.withValues(alpha: 0.15)
+                          : AppColors.error.withValues(alpha: 0.15),
                       child: Text(
                         isOpen ? 'OPEN' : 'CLOSED',
                         style: AppTextStyles.labelSmall.copyWith(
@@ -364,7 +415,11 @@ class _BranchCard extends StatelessWidget {
                   child: _ActionBtn(
                     label: 'DIRECTIONS',
                     icon: Icons.directions_outlined,
-                    onTap: () {},
+                    onTap: () async {
+                      final uri = Uri.parse(
+                          'https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}');
+                      if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                    },
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -403,7 +458,7 @@ class _BranchCard extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      builder: (_) => Padding(
+      builder: (ctx) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -426,10 +481,7 @@ class _BranchCard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/booking');
-              },
+              onTap: () => context.push('/booking'),
               child: Container(
                 height: 52,
                 color: AppColors.accent,
@@ -443,7 +495,7 @@ class _BranchCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap: () => Navigator.pop(context),
+              onTap: () => Navigator.of(ctx).pop(),
               child: Container(
                 height: 48,
                 alignment: Alignment.center,
@@ -599,7 +651,7 @@ class _MockMapPainter extends CustomPainter {
       Offset(centerX, centerY),
       10,
       Paint()
-        ..color = const Color(0xFF4A90D9).withOpacity(0.3)
+        ..color = const Color(0xFF4A90D9).withValues(alpha: 0.3)
         ..style = PaintingStyle.fill,
     );
     canvas.drawCircle(

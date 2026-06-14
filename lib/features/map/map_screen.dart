@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/branch.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../widgets/shimmer_widgets.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -41,12 +43,10 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: _loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(color: AppColors.accent))
+          ? const ShimmerBranchList()
           : Column(
               children: [
                 // Map view
@@ -91,16 +91,16 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   AppBar _buildAppBar() => AppBar(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'NEARBY BOUTIQUES',
           style:
-              AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+              AppTextStyles.labelLarge.copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
         centerTitle: true,
         actions: [
@@ -187,7 +187,7 @@ class _MapPin extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 8, vertical: 3),
-              color: AppColors.black.withOpacity(0.8),
+              color: AppColors.black.withValues(alpha: 0.8),
               child: Text(
                 '${distKm}km',
                 style: AppTextStyles.bodySmall.copyWith(
@@ -202,7 +202,7 @@ class _MapPin extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
@@ -311,8 +311,8 @@ class _BranchCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       color: isOpen
-                          ? AppColors.success.withOpacity(0.15)
-                          : AppColors.error.withOpacity(0.15),
+                          ? AppColors.success.withValues(alpha: 0.15)
+                          : AppColors.error.withValues(alpha: 0.15),
                       child: Text(
                         isOpen ? 'OPEN' : 'CLOSED',
                         style: AppTextStyles.labelSmall.copyWith(
@@ -364,7 +364,11 @@ class _BranchCard extends StatelessWidget {
                   child: _ActionBtn(
                     label: 'DIRECTIONS',
                     icon: Icons.directions_outlined,
-                    onTap: () {},
+                    onTap: () async {
+                      final uri = Uri.parse(
+                          'https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}');
+                      if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                    },
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -403,7 +407,7 @@ class _BranchCard extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      builder: (_) => Padding(
+      builder: (ctx) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -426,10 +430,7 @@ class _BranchCard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/booking');
-              },
+              onTap: () => context.push('/booking'),
               child: Container(
                 height: 52,
                 color: AppColors.accent,
@@ -443,7 +444,7 @@ class _BranchCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap: () => Navigator.pop(context),
+              onTap: () => Navigator.of(ctx).pop(),
               child: Container(
                 height: 48,
                 alignment: Alignment.center,
@@ -599,7 +600,7 @@ class _MockMapPainter extends CustomPainter {
       Offset(centerX, centerY),
       10,
       Paint()
-        ..color = const Color(0xFF4A90D9).withOpacity(0.3)
+        ..color = const Color(0xFF4A90D9).withValues(alpha: 0.3)
         ..style = PaintingStyle.fill,
     );
     canvas.drawCircle(

@@ -13,8 +13,6 @@ class _FeedItem {
   final String title;
   final String? subtitle;
   final String? tag;
-  final String? promoCode;
-  final int? discountPercent;
   final String? actionLabel;
   final String? actionRoute;
 
@@ -24,8 +22,6 @@ class _FeedItem {
     required this.title,
     this.subtitle,
     this.tag,
-    this.promoCode,
-    this.discountPercent,
     this.actionLabel,
     this.actionRoute,
   });
@@ -98,7 +94,6 @@ class ConsumerlessPromotionsFeed extends StatefulWidget {
 }
 
 class _MediaFeedState extends State<ConsumerlessPromotionsFeed> {
-  List<Promotion> _promotions = [];
   bool _loading = true;
   final Set<String> _copiedCodes = {};
 
@@ -133,7 +128,6 @@ class _MediaFeedState extends State<ConsumerlessPromotionsFeed> {
     }
 
     setState(() {
-      _promotions = promos;
       _feedItems = combined;
       _loading = false;
     });
@@ -254,10 +248,10 @@ class _FeedCardState extends State<_FeedCard> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.black.withOpacity(0.3),
+                  AppColors.black.withValues(alpha: 0.3),
                   Colors.transparent,
                   Colors.transparent,
-                  AppColors.black.withOpacity(0.9),
+                  AppColors.black.withValues(alpha: 0.9),
                 ],
                 stops: const [0.0, 0.2, 0.5, 1.0],
               ),
@@ -290,7 +284,7 @@ class _FeedCardState extends State<_FeedCard> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.black.withOpacity(0.5),
+                  color: AppColors.black.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                   border:
                       Border.all(color: AppColors.white, width: 1.5),
@@ -427,7 +421,7 @@ class _PromoCard extends StatelessWidget {
           // Dark overlay
           DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.black.withOpacity(0.72),
+              color: AppColors.black.withValues(alpha: 0.72),
             ),
           ),
 
@@ -492,7 +486,7 @@ class _PromoCard extends StatelessWidget {
                                 : AppColors.grey600,
                           ),
                           color: copied
-                              ? AppColors.accent.withOpacity(0.1)
+                              ? AppColors.accent.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                         child: Row(

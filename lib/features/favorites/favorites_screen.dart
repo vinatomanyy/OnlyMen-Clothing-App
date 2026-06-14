@@ -8,6 +8,8 @@ import '../../state/favorites_provider.dart';
 import '../../state/card_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../utils/responsive.dart';
+import '../../widgets/shimmer_widgets.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -59,27 +61,26 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final favorites = _favoriteProducts(favoriteIds);
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(context, favorites.length),
       body: _loadingProducts
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.accent))
+          ? const ShimmerProductList()
           : favorites.isEmpty
               ? _buildEmptyState(context)
-              : _buildGrid(context, favorites),
+              : _buildList(context, favorites),
     );
   }
 
   AppBar _buildAppBar(BuildContext context, int count) => AppBar(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
         title: Column(
           children: [
             Text(
-              'SAVED',
+              'FAVORITES',
               style:
-                  AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+                  AppTextStyles.labelLarge.copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
             if (count > 0)
               Text(
@@ -121,21 +122,44 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         ),
       );
 
-  Widget _buildGrid(BuildContext context, List<Product> favorites) =>
-      GridView.builder(
+  Widget _buildList(BuildContext context, List<Product> favorites) =>
+      Responsive.isTablet(context)
+          ? GridView.builder(
+              padding: const EdgeInsets.fromLTRB(32, 12, 32, 32),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.8,
+              ),
+              itemCount: favorites.length,
+              itemBuilder: (_, i) => _FavoriteCard(
+                product: favorites[i],
+                onRemove: () => ref.read(favoritesProvider.notifier).toggle(favorites[i].id),
+                onAddToCart: () => _addToCart(context, favorites[i]),
+              ),
+            )
+          : ListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.58,
-        ),
         itemCount: favorites.length,
-        itemBuilder: (_, i) => _FavoriteCard(
-          product: favorites[i],
-          onRemove: () =>
+        itemBuilder: (_, i) => Dismissible(
+          key: Key(favorites[i].id),
+          direction: DismissDirection.endToStart,
+          onDismissed: (_) =>
               ref.read(favoritesProvider.notifier).toggle(favorites[i].id),
-          onAddToCart: () => _addToCart(context, favorites[i]),
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            color: AppColors.error.withValues(alpha: 0.15),
+            child: const Icon(Icons.delete_outline,
+                color: AppColors.error, size: 22),
+          ),
+          child: _FavoriteCard(
+            product: favorites[i],
+            onRemove: () =>
+                ref.read(favoritesProvider.notifier).toggle(favorites[i].id),
+            onAddToCart: () => _addToCart(context, favorites[i]),
+          ),
         ),
       );
 }
@@ -156,130 +180,115 @@ class _FavoriteCard extends StatelessWidget {
     final p = product;
     return GestureDetector(
       onTap: () => context.push('/product/${p.id}'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          Expanded(
-            child: Stack(
-              fit: StackFit.expand,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            Stack(
               children: [
-                Image.network(
-                  p.images.first,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      Container(color: AppColors.grey800),
-                ),
-                // Remove favorite
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: onRemove,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      color: AppColors.black.withOpacity(0.55),
-                      child: const Icon(Icons.favorite,
-                          color: AppColors.error, size: 16),
+                Hero(
+                  tag: 'product-image-${p.id}',
+                  child: SizedBox(
+                    width: 110,
+                    height: 130,
+                    child: Image.network(
+                      p.images.first,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Container(color: AppColors.grey800),
                     ),
                   ),
                 ),
-                // Badges
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (p.isNew)
-                        _Badge(
-                            label: 'NEW',
-                            bg: AppColors.accent,
-                            fg: AppColors.black),
-                      if (p.hasDiscount) ...[
-                        const SizedBox(height: 4),
-                        _Badge(
-                            label: '-${p.discountPercent}%',
-                            bg: AppColors.error,
-                            fg: AppColors.white),
-                      ],
-                    ],
+                if (p.isNew)
+                  Positioned(
+                    top: 8, left: 8,
+                    child: _Badge(label: 'NEW', bg: AppColors.accent, fg: AppColors.black),
                   ),
-                ),
-                // Add to bag overlay at bottom
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: onAddToCart,
-                    child: Container(
-                      height: 36,
-                      color: AppColors.black.withOpacity(0.75),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'ADD TO BAG',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.white,
-                          fontSize: 10,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ),
+                if (p.hasDiscount)
+                  Positioned(
+                    top: p.isNew ? 28 : 8, left: 8,
+                    child: _Badge(label: '-${p.discountPercent}%', bg: AppColors.error, fg: AppColors.white),
                   ),
-                ),
               ],
             ),
-          ),
-          const SizedBox(height: 8),
-          // Name
-          Text(
-            p.name,
-            style:
-                AppTextStyles.bodySmall.copyWith(color: AppColors.white),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          // Price
-          Row(
-            children: [
-              Text(
-                '\$${p.price.toStringAsFixed(0)}',
-                style: AppTextStyles.labelMedium
-                    .copyWith(color: AppColors.accent),
+            // Details
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(p.name,
+                              style: AppTextStyles.bodyMedium
+                                  .copyWith(color: AppColors.white),
+                              maxLines: 2),
+                        ),
+                        GestureDetector(
+                          onTap: onRemove,
+                          child: const Icon(Icons.favorite,
+                              color: AppColors.error, size: 18),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text('\$${p.price.toStringAsFixed(0)}',
+                            style: AppTextStyles.labelMedium
+                                .copyWith(color: AppColors.accent)),
+                        if (p.hasDiscount) ...[
+                          const SizedBox(width: 6),
+                          Text('\$${p.originalPrice!.toStringAsFixed(0)}',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.grey600,
+                                decoration: TextDecoration.lineThrough,
+                              )),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: p.colors.take(3).map((c) => Container(
+                            width: 10, height: 10,
+                            margin: const EdgeInsets.only(right: 4),
+                            decoration: BoxDecoration(
+                              color: Color(c.hex),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.grey700, width: 0.5),
+                            ),
+                          )).toList(),
+                    ),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: onAddToCart,
+                      child: Container(
+                        height: 32,
+                        color: AppColors.white,
+                        alignment: Alignment.center,
+                        child: Text('ADD TO BAG',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.black,
+                              fontSize: 10,
+                              letterSpacing: 1.5,
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (p.hasDiscount) ...[
-                const SizedBox(width: 6),
-                Text(
-                  '\$${p.originalPrice!.toStringAsFixed(0)}',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey600,
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 4),
-          // Colors preview
-          Row(
-            children: p.colors.take(3).map((c) {
-              return Container(
-                width: 10,
-                height: 10,
-                margin: const EdgeInsets.only(right: 4),
-                decoration: BoxDecoration(
-                  color: Color(c.hex),
-                  border: Border.all(
-                      color: AppColors.grey700, width: 0.5),
-                  shape: BoxShape.circle,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

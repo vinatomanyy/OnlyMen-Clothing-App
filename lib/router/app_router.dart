@@ -9,12 +9,13 @@ import '../features/map/map_screen.dart';
 import '../features/nearby/nearby_screen.dart';
 import '../features/promotions/promotions_screen.dart';
 import '../features/cart/cart_screen.dart';
+import '../features/cart/checkout_screen.dart';
 import '../features/booking/booking_screen.dart';
 import '../features/chat/chat_screen.dart';
 import '../features/reviews/reviews_screen.dart';
 import '../features/gallery/gallery_screen.dart';
-import '../features/settings/settings_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../features/splash/splash_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/stylist/stylist_screen.dart';
 import '../widgets/main_shell.dart';
@@ -22,10 +23,17 @@ import '../widgets/main_shell.dart';
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final shellNavigatorKey = GlobalKey<NavigatorState>();
 
-final appRouter = GoRouter(
+GoRouter buildRouter({bool showOnboarding = false}) => GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/splash',
   routes: [
+    // Splash
+    GoRoute(
+      path: '/splash',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const SplashScreen(),
+    ),
+
     // Onboarding — outside shell
     GoRoute(
       path: '/onboarding',
@@ -98,6 +106,14 @@ final appRouter = GoRouter(
       builder: (context, state) => const CartScreen(),
     ),
     GoRoute(
+      path: '/checkout',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) {
+        final total = double.tryParse(state.uri.queryParameters['total'] ?? '0') ?? 0;
+        return CheckoutScreen(total: total);
+      },
+    ),
+    GoRoute(
       path: '/booking',
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) => const BookingScreen(),
@@ -118,11 +134,6 @@ final appRouter = GoRouter(
       path: '/gallery',
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) => const GalleryScreen(),
-    ),
-    GoRoute(
-      path: '/settings',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => const SettingsScreen(),
     ),
   ],
 );
