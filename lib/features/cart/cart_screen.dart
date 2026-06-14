@@ -65,7 +65,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final total = subtotal - discountAmt;
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(context, items.length),
       body: items.isEmpty
           ? _buildEmptyCart(context)
@@ -116,15 +116,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   AppBar _buildAppBar(BuildContext context, int count) => AppBar(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'MY BAG ($count)',
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+          style: AppTextStyles.labelLarge.copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
         centerTitle: true,
         actions: [
@@ -183,7 +183,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.accent),
-                color: AppColors.accent.withOpacity(0.08),
+                color: AppColors.accent.withValues(alpha: 0.08),
               ),
               child: Row(
                 children: [
@@ -291,24 +291,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       Container(
         padding: EdgeInsets.fromLTRB(
             20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceDark,
-          border: Border(top: BorderSide(color: AppColors.grey800)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
         ),
         child: GestureDetector(
           onTap: isEmpty
               ? null
-              : () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Checkout coming soon',
-                          style: AppTextStyles.bodySmall
-                              .copyWith(color: AppColors.black)),
-                      backgroundColor: AppColors.accent,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
+              : () => context.push('/checkout?total=${total.toStringAsFixed(2)}'),
           child: Container(
             height: 52,
             color: isEmpty ? AppColors.grey800 : AppColors.accent,
@@ -350,7 +340,7 @@ class _CartItemCard extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        color: AppColors.error.withOpacity(0.15),
+        color: AppColors.error.withValues(alpha: 0.15),
         child: const Icon(Icons.delete_outline,
             color: AppColors.error, size: 22),
       ),
@@ -358,8 +348,8 @@ class _CartItemCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.cardDark,
-          border: Border.all(color: AppColors.grey800),
+          color: Theme.of(context).cardColor,
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

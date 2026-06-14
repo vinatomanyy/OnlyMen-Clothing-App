@@ -8,14 +8,17 @@ import '../../state/products_provider.dart';
 import '../../state/promotions_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../state/theme_provider.dart';
+import '../../utils/responsive.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeProvider) == ThemeMode.dark;
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.white,
       body: CustomScrollView(
         slivers: [
           _AppBar(),
@@ -31,27 +34,35 @@ class HomeScreen extends ConsumerWidget {
 }
 
 // ── App Bar ──────────────────────────────────────────────────
-class _AppBar extends StatelessWidget {
+class _AppBar extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeProvider) == ThemeMode.dark;
+    final fg = isDark ? AppColors.white : AppColors.black;
+    final bg = isDark ? AppColors.surfaceDark : AppColors.white;
+
     return SliverAppBar(
       floating: true,
-      backgroundColor: AppColors.white,
+      backgroundColor: bg,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.menu, color: AppColors.black),
+        icon: Icon(Icons.menu, color: fg),
         onPressed: () {},
       ),
       title: Text(
         'OnlyMen',
-        style: AppTextStyles.h2.copyWith(
-          color: AppColors.black,
-          letterSpacing: 2,
-        ),
+        style: AppTextStyles.h2.copyWith(color: fg, letterSpacing: 2),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.shopping_bag_outlined, color: AppColors.black),
+          icon: Icon(
+            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            color: fg,
+          ),
+          onPressed: () => ref.read(themeProvider.notifier).toggle(),
+        ),
+        IconButton(
+          icon: Icon(Icons.shopping_bag_outlined, color: fg),
           onPressed: () => context.push('/cart'),
         ),
       ],
@@ -321,7 +332,7 @@ class _NewArrivalsSection extends StatelessWidget {
               children: [
                 const Text('New Arrivals', style: AppTextStyles.h3),
                 GestureDetector(
-                  onTap: () => context.push('/category/new'),
+                  onTap: () => context.push('/category/all'),
                   child: Text(
                     'View All',
                     style: AppTextStyles.labelSmall.copyWith(
@@ -375,23 +386,26 @@ class _ProductCard extends StatelessWidget {
             Expanded(
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: CachedNetworkImage(
-                      imageUrl: product.images.isNotEmpty
-                          ? product.images.first
-                          : '',
-                      width: 180,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: AppColors.grey200,
-                        highlightColor: AppColors.grey100,
-                        child: Container(color: AppColors.grey200),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppColors.grey100,
-                        child: const Icon(Icons.image_outlined,
-                            color: AppColors.grey400),
+                  Hero(
+                    tag: 'product-image-${product.id}',
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: CachedNetworkImage(
+                        imageUrl: product.images.isNotEmpty
+                            ? product.images.first
+                            : '',
+                        width: 180,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: AppColors.grey200,
+                          highlightColor: AppColors.grey100,
+                          child: Container(color: AppColors.grey200),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: AppColors.grey100,
+                          child: const Icon(Icons.image_outlined,
+                              color: AppColors.grey400),
+                        ),
                       ),
                     ),
                   ),
@@ -463,8 +477,11 @@ class _CategoriesSection extends StatelessWidget {
       {'label': 'Premium', 'icon': Icons.diamond_outlined, 'value': 'jackets'},
     ];
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 32, left: 20, right: 20),
+    return Builder(builder: (context) => Padding(
+      padding: EdgeInsets.only(
+          top: 32,
+          left: Responsive.horizontalPadding(context),
+          right: Responsive.horizontalPadding(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -482,7 +499,7 @@ class _CategoriesSection extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -507,10 +524,10 @@ class _CategoryItem extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.grey100,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(32),
             ),
-            child: Icon(icon, color: AppColors.black, size: 28),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 28),
           ),
           const SizedBox(height: 8),
           Text(

@@ -114,7 +114,7 @@ class _LookbookScreenState extends State<LookbookScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.black.withOpacity(0.5),
+                    color: AppColors.black.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.arrow_back,
@@ -244,8 +244,8 @@ class _LookbookPageState extends State<_LookbookPage>
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      AppColors.black.withOpacity(0.7),
-                      AppColors.black.withOpacity(0.95),
+                      AppColors.black.withValues(alpha: 0.7),
+                      AppColors.black.withValues(alpha: 0.95),
                     ],
                     stops: const [0.0, 0.5, 1.0],
                   ),
@@ -406,7 +406,7 @@ class _LookbookProductCard extends StatelessWidget {
           width: 110,
           margin: const EdgeInsets.only(right: 12),
           decoration: BoxDecoration(
-            color: AppColors.grey900.withOpacity(0.85),
+            color: AppColors.grey900.withValues(alpha: 0.85),
             border: Border.all(color: AppColors.grey800),
           ),
           child: Column(

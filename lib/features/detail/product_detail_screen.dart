@@ -1,20 +1,26 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/product.dart';
 import '../../models/review.dart';
+import '../../state/card_provider.dart';
+import '../../state/favorites_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../utils/responsive.dart';
+import '../../widgets/shimmer_widgets.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
   const ProductDetailScreen({super.key, required this.productId});
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Product? _product;
   List<Product> _related = [];
   bool _loading = true;
@@ -22,8 +28,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImage = 0;
   String? _selectedSize;
   int _selectedColorIndex = 0;
-  FitFeedback? _fitFeedback;
-  bool _favorited = false;
+  List<Review> _reviews = [];
   bool _descExpanded = false;
 
   final PageController _pageController = PageController();
@@ -51,9 +56,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         .where((p) => p.category == product.category && p.id != product.id)
         .take(4)
         .toList();
+    final reviewRaw = await rootBundle.loadString('assets/mock/reviews.json');
+    final reviews = (jsonDecode(reviewRaw) as List)
+        .map((e) => Review.fromJson(e))
+        .where((r) => r.productId == product.id)
+        .toList();
     setState(() {
       _product = product;
       _related = related;
+      _reviews = reviews;
       _loading = false;
     });
   }
@@ -71,9 +82,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
       return;
     }
+    final p = _product!;
+    ref.read(cartProvider.notifier).add(
+          p,
+          _selectedSize!,
+          p.colors[_selectedColorIndex].name,
+        );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Added to cart',
+        content: Text('Added to bag',
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.black)),
         backgroundColor: AppColors.accent,
         behavior: SnackBarBehavior.floating,
@@ -85,17 +102,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        backgroundColor: AppColors.surfaceDark,
-        body: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const ShimmerProductDetail(),
       );
     }
 
     final p = _product!;
 
+    final isTablet = Responsive.isTablet(context);
+
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
-      body: Stack(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: isTablet
+          ? _buildTabletLayout(p)
+          : Stack(
         children: [
           CustomScrollView(
             slivers: [
@@ -146,6 +167,67 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  Widget _buildTabletLayout(Product p) => Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Left: image locked to full height
+          Expanded(
+            flex: 5,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Hero(
+                  tag: 'product-image-${p.id}',
+                  child: Image.network(
+                    p.images.first,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        Container(color: AppColors.grey900),
+                  ),
+                ),
+                Positioned(
+                  top: 0, left: 0, right: 0,
+                  child: _buildOverlayBar(p),
+                ),
+              ],
+            ),
+          ),
+          // Right: details locked to same height
+          Expanded(
+            flex: 5,
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 48, 24, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(p),
+                          const SizedBox(height: 20),
+                          _buildColorSelector(p),
+                          const SizedBox(height: 20),
+                          _buildSizeSelector(p),
+                          const SizedBox(height: 20),
+                          _buildFitFeedback(),
+                          const SizedBox(height: 24),
+                          _buildDescription(p),
+                          const SizedBox(height: 24),
+                          _buildReviewSummary(p),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _buildBottomCTA(p),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+
   Widget _buildOverlayBar(Product p) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -153,13 +235,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               _CircleButton(
                 icon: Icons.arrow_back,
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
               ),
               const Spacer(),
               _CircleButton(
-                icon: _favorited ? Icons.favorite : Icons.favorite_border,
-                iconColor: _favorited ? AppColors.error : AppColors.white,
-                onTap: () => setState(() => _favorited = !_favorited),
+                icon: ref.watch(favoritesProvider).contains(_product?.id ?? '')
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                iconColor: ref.watch(favoritesProvider).contains(_product?.id ?? '')
+                    ? AppColors.error
+                    : AppColors.white,
+                onTap: () => ref.read(favoritesProvider.notifier).toggle(_product!.id),
               ),
               const SizedBox(width: 8),
               _CircleButton(
@@ -180,16 +266,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 controller: _pageController,
                 itemCount: p.images.length,
                 onPageChanged: (i) => setState(() => _currentImage = i),
-                itemBuilder: (_, i) => Image.network(
-                  p.images[i],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppColors.grey900,
-                    child: const Icon(Icons.image_not_supported,
-                        color: AppColors.grey700, size: 48),
-                  ),
-                ),
+                itemBuilder: (_, i) => i == 0
+                    ? Hero(
+                        tag: 'product-image-${p.id}',
+                        child: Image.network(
+                          p.images[i],
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.grey900,
+                            child: const Icon(Icons.image_not_supported,
+                                color: AppColors.grey700, size: 48),
+                          ),
+                        ),
+                      )
+                    : Image.network(
+                        p.images[i],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: AppColors.grey900,
+                          child: const Icon(Icons.image_not_supported,
+                              color: AppColors.grey700, size: 48),
+                        ),
+                      ),
               ),
               // Dot indicators
               Positioned(
@@ -421,45 +521,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       );
 
-  Widget _buildFitFeedback() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('FIT FEEDBACK',
-              style:
-                  AppTextStyles.labelSmall.copyWith(color: AppColors.grey400)),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              _FitChip(
-                label: 'Runs Small',
-                selected: _fitFeedback == FitFeedback.runsSmall,
-                onTap: () => setState(() => _fitFeedback =
-                    _fitFeedback == FitFeedback.runsSmall
-                        ? null
-                        : FitFeedback.runsSmall),
-              ),
-              const SizedBox(width: 8),
-              _FitChip(
-                label: 'True to Size',
-                selected: _fitFeedback == FitFeedback.trueToSize,
-                onTap: () => setState(() => _fitFeedback =
-                    _fitFeedback == FitFeedback.trueToSize
-                        ? null
-                        : FitFeedback.trueToSize),
-              ),
-              const SizedBox(width: 8),
-              _FitChip(
-                label: 'Runs Large',
-                selected: _fitFeedback == FitFeedback.runsLarge,
-                onTap: () => setState(() => _fitFeedback =
-                    _fitFeedback == FitFeedback.runsLarge
-                        ? null
-                        : FitFeedback.runsLarge),
-              ),
-            ],
+  Widget _buildFitFeedback() {
+    if (_reviews.isEmpty) return const SizedBox.shrink();
+
+    final small = _reviews.where((r) => r.fitFeedback == FitFeedback.runsSmall).length;
+    final trueSize = _reviews.where((r) => r.fitFeedback == FitFeedback.trueToSize).length;
+    final large = _reviews.where((r) => r.fitFeedback == FitFeedback.runsLarge).length;
+    final dominant = trueSize >= small && trueSize >= large
+        ? 'True to Size'
+        : small > large
+            ? 'Runs Small'
+            : 'Runs Large';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('FIT',
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey400)),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.accent),
+            color: AppColors.accent.withValues(alpha: 0.08),
           ),
-        ],
-      );
+          child: Text(
+            dominant,
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text('Based on ${_reviews.length} reviews',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey700, fontSize: 10)),
+      ],
+    );
+  }
 
   Widget _buildDescription(Product p) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -504,7 +600,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               const Spacer(),
               GestureDetector(
                 onTap: () =>
-                    Navigator.pushNamed(context, '/reviews', arguments: p.id),
+                    context.push('/reviews/${p.id}'),
                 child: Text('SEE ALL',
                     style: AppTextStyles.labelSmall
                         .copyWith(color: AppColors.accent)),
@@ -558,9 +654,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               itemBuilder: (_, i) {
                 final r = _related[i];
                 return GestureDetector(
-                  onTap: () => Navigator.pushReplacementNamed(
-                      context, '/detail',
-                      arguments: r),
+                  onTap: () => context.push('/product/${r.id}'),
                   child: Container(
                     width: 130,
                     margin: const EdgeInsets.only(right: 12),
@@ -599,7 +693,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         padding: EdgeInsets.fromLTRB(
             20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
         decoration: BoxDecoration(
-          color: AppColors.surfaceDark,
+          color: Theme.of(context).scaffoldBackgroundColor,
           border: const Border(
               top: BorderSide(color: AppColors.grey800, width: 1)),
         ),
@@ -607,7 +701,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             // Cart icon
             GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/cart'),
+              onTap: () => context.push('/cart'),
               child: Container(
                 width: 52,
                 height: 52,
@@ -658,7 +752,7 @@ class _CircleButton extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.black.withOpacity(0.55),
+            color: AppColors.black.withValues(alpha: 0.55),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: iconColor ?? AppColors.white, size: 20),
@@ -666,32 +760,3 @@ class _CircleButton extends StatelessWidget {
       );
 }
 
-class _FitChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const _FitChip(
-      {required this.label, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.accent : Colors.transparent,
-            border: Border.all(
-              color: selected ? AppColors.accent : AppColors.grey700,
-            ),
-          ),
-          child: Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: selected ? AppColors.black : AppColors.grey400,
-              fontSize: 10,
-            ),
-          ),
-        ),
-      );
-}

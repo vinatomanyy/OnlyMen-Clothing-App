@@ -91,6 +91,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
   // Chat state
   final _chatController = TextEditingController();
   final _scrollController = ScrollController();
+  bool _isTyping = false;
   final List<_ChatMessage> _messages = [
     _ChatMessage(
       text:
@@ -103,7 +104,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -134,15 +135,26 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
         );
       }
     });
-    // Mock reply
+    // Show typing indicator then reply
+    setState(() => _isTyping = true);
     Future.delayed(const Duration(seconds: 1), () {
       if (!mounted) return;
       setState(() {
+        _isTyping = false;
         _messages.add(const _ChatMessage(
           text: 'Great choice! I\'ll put together some options for you.',
           isAlex: true,
           time: '',
         ));
+      });
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
       });
     });
   }
@@ -179,7 +191,6 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
         day: _selectedDay!,
         slot: _selectedSlot!,
         onConfirm: () {
-          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Booking confirmed!',
@@ -197,7 +208,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (_, __) => [
           _buildSliverHeader(),
@@ -211,7 +222,6 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                 children: [
                   _buildBookingTab(),
                   _buildChatTab(),
-                  _buildPicksTab(),
                 ],
               ),
             ),
@@ -222,11 +232,11 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
   }
 
   SliverAppBar _buildSliverHeader() => SliverAppBar(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         expandedHeight: 280,
         pinned: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
         flexibleSpace: FlexibleSpaceBar(
@@ -234,7 +244,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
         ),
         title: Text('PERSONAL STYLING',
             style:
-                AppTextStyles.labelSmall.copyWith(color: AppColors.white)),
+                AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.onSurface)),
         centerTitle: true,
       );
 
@@ -329,16 +339,15 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
           unselectedLabelColor: AppColors.grey600,
           labelStyle: AppTextStyles.labelSmall,
           tabs: const [
-            Tab(text: 'BOOK'),
+            Tab(text: 'BOOKING'),
             Tab(text: 'CHAT'),
-            Tab(text: 'PICKS'),
           ],
         ),
       );
 
   // ── BOOKING TAB ──────────────────────────────────────────────────
   Widget _buildBookingTab() => ListView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).padding.bottom + 20),
         children: [
           Text('BOOK APPOINTMENT',
               style:
@@ -531,43 +540,55 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
   // ── CHAT TAB ─────────────────────────────────────────────────────
   Widget _buildChatTab() => Column(
         children: [
-          // Messages
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (_, i) => _buildChatBubble(_messages[i]),
+              itemCount: _messages.length + (_isTyping ? 1 : 0),
+              itemBuilder: (_, i) {
+                if (_isTyping && i == _messages.length) {
+                  return _buildTypingIndicator();
+                }
+                return _buildChatBubble(_messages[i]);
+              },
             ),
           ),
-          // Input
           Container(
-            padding: EdgeInsets.fromLTRB(
-                16, 10, 16, MediaQuery.of(context).padding.bottom + 10),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
             decoration: const BoxDecoration(
               color: AppColors.surfaceDark,
-              border:
-                  Border(top: BorderSide(color: AppColors.grey800)),
+              border: Border(top: BorderSide(color: AppColors.grey800)),
             ),
             child: Row(
               children: [
+                GestureDetector(
+                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Attachments coming soon',
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black)),
+                      backgroundColor: AppColors.accent,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.only(right: 10),
+                    child: Icon(Icons.attach_file, color: AppColors.grey500, size: 22),
+                  ),
+                ),
                 Expanded(
                   child: TextField(
                     controller: _chatController,
-                    style: AppTextStyles.bodyMedium
-                        .copyWith(color: AppColors.white),
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
                     decoration: InputDecoration(
                       hintText: 'Type a message...',
-                      hintStyle: AppTextStyles.bodyMedium
-                          .copyWith(color: AppColors.grey600),
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey600),
                       filled: true,
                       fillColor: AppColors.grey900,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(0),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
@@ -579,14 +600,34 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                     width: 44,
                     height: 44,
                     color: AppColors.accent,
-                    child: const Icon(Icons.send,
-                        color: AppColors.black, size: 18),
+                    child: const Icon(Icons.send, color: AppColors.black, size: 18),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      );
+
+  Widget _buildTypingIndicator() => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: NetworkImage(_mockStylist.avatarUrl),
+              backgroundColor: AppColors.grey800,
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: AppColors.cardDark,
+              ),
+              child: _TypingDots(),
+            ),
+          ],
+        ),
       );
 
   Widget _buildChatBubble(_ChatMessage msg) => Padding(
@@ -643,22 +684,6 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
         ),
       );
 
-  // ── PICKS TAB ────────────────────────────────────────────────────
-  Widget _buildPicksTab() => ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(
-            "${_mockStylist.name.split(' ').first}'s Picks",
-            style: AppTextStyles.labelSmall
-                .copyWith(color: AppColors.grey400),
-          ),
-          const SizedBox(height: 4),
-          Text('Curated just for you',
-              style: AppTextStyles.h3.copyWith(color: AppColors.white)),
-          const SizedBox(height: 20),
-          ..._mockStylist.picks.map((pick) => _PickCard(pick: pick)),
-        ],
-      );
 
   String _monthName(int month) => [
         '', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -687,68 +712,6 @@ class _StatChip extends StatelessWidget {
       );
 }
 
-class _PickCard extends StatelessWidget {
-  final _PickItem pick;
-  const _PickCard({required this.pick});
-
-  @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        height: 200,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.network(pick.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Container(color: AppColors.grey800)),
-            // Gradient
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    AppColors.black.withOpacity(0.8),
-                  ],
-                ),
-              ),
-            ),
-            // Text
-            Positioned(
-              bottom: 14,
-              left: 14,
-              right: 14,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(pick.name,
-                        style: AppTextStyles.bodyMedium
-                            .copyWith(color: AppColors.white)),
-                  ),
-                  Text(pick.price,
-                      style: AppTextStyles.labelMedium
-                          .copyWith(color: AppColors.accent)),
-                ],
-              ),
-            ),
-            // Favorite star
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Container(
-                width: 32,
-                height: 32,
-                color: AppColors.black.withOpacity(0.5),
-                child: const Icon(Icons.star_border,
-                    color: AppColors.white, size: 16),
-              ),
-            ),
-          ],
-        ),
-      );
-}
 
 class _ChatMessage {
   final String text;
@@ -817,7 +780,10 @@ class _BookingConfirmDialog extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: GestureDetector(
-                      onTap: onConfirm,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        onConfirm();
+                      },
                       child: Container(
                         height: 44,
                         color: AppColors.accent,
@@ -851,5 +817,52 @@ class _DialogRow extends StatelessWidget {
               style: AppTextStyles.bodySmall
                   .copyWith(color: AppColors.white)),
         ],
+      );
+}
+
+class _TypingDots extends StatefulWidget {
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _controller,
+        builder: (_, __) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(3, (i) {
+            final delay = i / 3;
+            final value = ((_controller.value - delay) % 1.0).clamp(0.0, 1.0);
+            final opacity = value < 0.5 ? value * 2 : (1.0 - value) * 2;
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: AppColors.grey400.withValues(alpha: opacity.clamp(0.3, 1.0)),
+                shape: BoxShape.circle,
+              ),
+            );
+          }),
+        ),
       );
 }

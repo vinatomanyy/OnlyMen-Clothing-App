@@ -94,13 +94,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fg = Theme.of(context).colorScheme.onSurface;
+    final inputBg = isDark ? AppColors.grey900 : AppColors.grey100;
+    final borderColor = isDark ? AppColors.grey800 : AppColors.grey300;
+
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(context),
-            const Divider(color: AppColors.grey800, height: 1),
+            _buildSearchBar(context, isDark: isDark, fg: fg, inputBg: inputBg),
+            Divider(color: borderColor, height: 1),
             Expanded(
               child: _loading
                   ? const Center(
@@ -115,27 +120,26 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) => Padding(
+  Widget _buildSearchBar(BuildContext context, {required bool isDark, required Color fg, required Color inputBg}) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Row(
           children: [
             Expanded(
               child: Container(
                 height: 46,
-                color: AppColors.grey900,
+                color: inputBg,
                 child: TextField(
                   controller: _controller,
                   focusNode: _focusNode,
-                  style: AppTextStyles.bodyMedium
-                      .copyWith(color: AppColors.white),
+                  style: AppTextStyles.bodyMedium.copyWith(color: fg),
                   textInputAction: TextInputAction.search,
                   onSubmitted: _submitSearch,
                   decoration: InputDecoration(
                     hintText: 'Search styles, brands, categories...',
                     hintStyle: AppTextStyles.bodyMedium
-                        .copyWith(color: AppColors.grey600),
-                    prefixIcon: const Icon(Icons.search,
-                        color: AppColors.grey500, size: 20),
+                        .copyWith(color: isDark ? AppColors.grey600 : AppColors.grey400),
+                    prefixIcon: Icon(Icons.search,
+                        color: isDark ? AppColors.grey500 : AppColors.grey400, size: 20),
                     suffixIcon: _hasQuery
                         ? GestureDetector(
                             onTap: () {
@@ -175,7 +179,14 @@ class _SearchScreenState extends State<SearchScreen> {
       );
 
   // ── Discovery (no query) ─────────────────────────────────────────
-  Widget _buildDiscovery() => ListView(
+  Widget _buildDiscovery() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subText = isDark ? AppColors.grey500 : AppColors.grey600;
+    final itemText = isDark ? AppColors.grey300 : AppColors.grey800;
+    final iconColor = isDark ? AppColors.grey600 : AppColors.grey400;
+    final dividerColor = isDark ? AppColors.grey800 : AppColors.grey300;
+
+    return ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           // Recent searches
@@ -183,14 +194,13 @@ class _SearchScreenState extends State<SearchScreen> {
             Row(
               children: [
                 Text('RECENT',
-                    style: AppTextStyles.labelSmall
-                        .copyWith(color: AppColors.grey500)),
+                    style: AppTextStyles.labelSmall.copyWith(color: subText)),
                 const Spacer(),
                 GestureDetector(
                   onTap: _clearRecent,
                   child: Text('CLEAR',
                       style: AppTextStyles.labelSmall
-                          .copyWith(color: AppColors.grey600, fontSize: 9)),
+                          .copyWith(color: subText, fontSize: 9)),
                 ),
               ],
             ),
@@ -205,28 +215,25 @@ class _SearchScreenState extends State<SearchScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Row(
                       children: [
-                        const Icon(Icons.history,
-                            color: AppColors.grey600, size: 16),
+                        Icon(Icons.history, color: iconColor, size: 16),
                         const SizedBox(width: 12),
                         Text(s,
                             style: AppTextStyles.bodyMedium
-                                .copyWith(color: AppColors.grey300)),
+                                .copyWith(color: itemText)),
                         const Spacer(),
-                        const Icon(Icons.north_west,
-                            color: AppColors.grey700, size: 14),
+                        Icon(Icons.north_west, color: iconColor, size: 14),
                       ],
                     ),
                   ),
                 )),
             const SizedBox(height: 24),
-            const Divider(color: AppColors.grey800),
+            Divider(color: dividerColor),
             const SizedBox(height: 24),
           ],
 
           // Category shortcuts
           Text('BROWSE BY CATEGORY',
-              style: AppTextStyles.labelSmall
-                  .copyWith(color: AppColors.grey500)),
+              style: AppTextStyles.labelSmall.copyWith(color: subText)),
           const SizedBox(height: 14),
           GridView.builder(
             shrinkWrap: true,
@@ -249,8 +256,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
           // Trending
           Text('TRENDING NOW',
-              style: AppTextStyles.labelSmall
-                  .copyWith(color: AppColors.grey500)),
+              style: AppTextStyles.labelSmall.copyWith(color: subText)),
           const SizedBox(height: 14),
           Wrap(
             spacing: 8,
@@ -276,18 +282,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          border:
-                              Border.all(color: AppColors.grey700),
+                          border: Border.all(color: dividerColor),
                         ),
                         child: Text(term,
                             style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.grey300)),
+                                color: itemText)),
                       ),
                     ))
                 .toList(),
           ),
         ],
       );
+  }
 
   // ── Results ──────────────────────────────────────────────────────
   Widget _buildResults() {

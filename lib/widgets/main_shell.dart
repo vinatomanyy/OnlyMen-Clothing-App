@@ -96,7 +96,7 @@ class _BottomNav extends StatelessWidget {
               _NavItem(
                 icon: Icons.favorite_outline,
                 activeIcon: Icons.favorite,
-                label: 'SAVED',
+                label: 'FAVORITES',
                 selected: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
