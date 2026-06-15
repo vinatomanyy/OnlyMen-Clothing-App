@@ -11,7 +11,6 @@ import '../features/promotions/promotions_screen.dart';
 import '../features/cart/cart_screen.dart';
 import '../features/cart/checkout_screen.dart';
 import '../features/booking/booking_screen.dart';
-import '../features/chat/chat_screen.dart';
 import '../features/reviews/reviews_screen.dart';
 import '../features/gallery/gallery_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
@@ -120,8 +119,7 @@ GoRouter buildRouter({bool showOnboarding = false}) => GoRouter(
     ),
     GoRoute(
       path: '/chat',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => const ChatScreen(),
+      redirect: (_, __) => '/stylist',
     ),
     GoRoute(
       path: '/reviews/:productId',

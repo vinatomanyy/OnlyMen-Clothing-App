@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../state/card_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../widgets/app_image.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -211,17 +212,25 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   child: TextField(
                     controller: _promoController,
                     style: AppTextStyles.bodyMedium
-                        .copyWith(color: AppColors.white),
+                        .copyWith(color: Theme.of(context).colorScheme.onSurface),
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
                       hintText: 'Enter code',
                       hintStyle: AppTextStyles.bodyMedium
-                          .copyWith(color: AppColors.grey600),
+                          .copyWith(color: AppColors.grey500),
                       filled: true,
-                      fillColor: AppColors.grey900,
+                      fillColor: Theme.of(context).cardColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(0),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(color: Theme.of(context).dividerColor),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                        borderSide: BorderSide(color: Theme.of(context).dividerColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                        borderSide: const BorderSide(color: AppColors.accent),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 14),
@@ -237,7 +246,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   child: Container(
                     height: 50,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    color: AppColors.white,
+                    color: AppColors.accent,
                     alignment: Alignment.center,
                     child: Text('APPLY',
                         style: AppTextStyles.labelSmall
@@ -254,8 +263,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.grey900,
-          border: Border.all(color: AppColors.grey800),
+          color: Theme.of(context).cardColor,
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           children: [
@@ -272,15 +281,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             _SummaryRow(
                 label: 'Shipping', value: 'FREE', valueColor: AppColors.success),
             const SizedBox(height: 12),
-            const Divider(color: AppColors.grey800),
+            Divider(color: Theme.of(context).dividerColor),
             const SizedBox(height: 12),
             _SummaryRow(
               label: 'TOTAL',
               value: '\$${total.toStringAsFixed(2)}',
               labelStyle: AppTextStyles.labelLarge
-                  .copyWith(color: AppColors.white),
-              valueStyle:
-                  AppTextStyles.price.copyWith(fontSize: 18),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+              valueStyle: AppTextStyles.price.copyWith(fontSize: 18),
             ),
           ],
         ),
@@ -355,15 +363,11 @@ class _CartItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Product image
-            SizedBox(
+            AppImage(
+              url: p.images.first,
+              fit: BoxFit.cover,
               width: 90,
               height: 110,
-              child: Image.network(
-                p.images.first,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Container(color: AppColors.grey800),
-              ),
             ),
             const SizedBox(width: 12),
             // Details
@@ -377,7 +381,7 @@ class _CartItemCard extends StatelessWidget {
                       Expanded(
                         child: Text(p.name,
                             style: AppTextStyles.bodyMedium
-                                .copyWith(color: AppColors.white),
+                                .copyWith(color: Theme.of(context).colorScheme.onSurface),
                             maxLines: 2),
                       ),
                       GestureDetector(
@@ -439,11 +443,11 @@ class _QuantityControl extends StatelessWidget {
             width: 36,
             height: 30,
             alignment: Alignment.center,
-            color: AppColors.grey900,
+            color: Theme.of(context).cardColor,
             child: Text(
               '$quantity',
               style: AppTextStyles.labelMedium
-                  .copyWith(color: AppColors.white),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
           _QtyBtn(icon: Icons.add, onTap: onIncrement),
@@ -462,8 +466,8 @@ class _QtyBtn extends StatelessWidget {
         child: Container(
           width: 30,
           height: 30,
-          color: AppColors.grey800,
-          child: Icon(icon, color: AppColors.white, size: 14),
+          color: Theme.of(context).dividerColor,
+          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 14),
         ),
       );
 }
@@ -494,7 +498,7 @@ class _SummaryRow extends StatelessWidget {
           Text(value,
               style: valueStyle ??
                   AppTextStyles.bodySmall.copyWith(
-                      color: valueColor ?? AppColors.white)),
+                      color: valueColor ?? Theme.of(context).colorScheme.onSurface)),
         ],
       );
 }
