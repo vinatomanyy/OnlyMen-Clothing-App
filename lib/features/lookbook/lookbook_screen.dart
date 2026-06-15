@@ -81,6 +81,7 @@ class _LookbookScreenState extends State<LookbookScreen> {
               products: _productsForLookbook(_lookbooks[i]),
               index: i,
               total: _lookbooks.length,
+              pageController: _pageController,
             ),
           ),
 
@@ -155,12 +156,14 @@ class _LookbookPage extends StatefulWidget {
   final List<Product> products;
   final int index;
   final int total;
+  final PageController pageController;
 
   const _LookbookPage({
     required this.lookbook,
     required this.products,
     required this.index,
     required this.total,
+    required this.pageController,
   });
 
   @override
@@ -218,16 +221,43 @@ class _LookbookPageState extends State<_LookbookPage>
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Full bleed editorial image
-            Image.network(
-              widget.lookbook.imageUrl,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.grey900,
-                child: const Icon(Icons.image_not_supported,
-                    color: AppColors.grey700, size: 64),
+            // Full bleed editorial image with parallax
+            ClipRect(
+              child: AnimatedBuilder(
+                animation: widget.pageController,
+                builder: (context, child) {
+                  final page = widget.pageController.hasClients &&
+                          widget.pageController.page != null
+                      ? widget.pageController.page!
+                      : widget.index.toDouble();
+                  // Shift background at 30% of page scroll speed
+                  final parallaxOffset =
+                      (widget.index - page) * 0.3 * size.width;
+                  return Transform.translate(
+                    offset: Offset(
+                      // Subtract half the extra width so image is centered at rest
+                      parallaxOffset - 0.3 * size.width,
+                      0,
+                    ),
+                    child: child,
+                  );
+                },
+                child: SizedBox(
+                  // Oversized so parallax never reveals blank edges
+                  width: size.width * 1.6,
+                  height: size.height,
+                  child: Image.network(
+                    widget.lookbook.imageUrl,
+                    fit: BoxFit.cover,
+                    width: size.width * 1.6,
+                    height: size.height,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: AppColors.grey900,
+                      child: const Icon(Icons.image_not_supported,
+                          color: AppColors.grey700, size: 64),
+                    ),
+                  ),
+                ),
               ),
             ),
 

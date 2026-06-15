@@ -10,6 +10,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/shimmer_widgets.dart';
+import '../../widgets/app_image.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -197,11 +198,9 @@ class _FavoriteCard extends StatelessWidget {
                   child: SizedBox(
                     width: 110,
                     height: 130,
-                    child: Image.network(
-                      p.images.first,
+                    child: AppImage(
+                      url: p.images.first,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          Container(color: AppColors.grey800),
                     ),
                   ),
                 ),

@@ -9,6 +9,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/shimmer_widgets.dart';
+import '../../widgets/app_image.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String category;
@@ -530,15 +531,10 @@ class _ProductCard extends ConsumerWidget {
                   child: Container(
                     width: double.infinity,
                     color: AppColors.grey900,
-                    child: Image.network(
-                      p.images.first,
+                    child: AppImage(
+                      url: p.images.first,
                       fit: BoxFit.cover,
                       width: double.infinity,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: AppColors.grey800,
-                        child: const Icon(Icons.image_not_supported,
-                            color: AppColors.grey600),
-                      ),
                     ),
                   ),
                 ),
@@ -583,7 +579,7 @@ class _ProductCard extends ConsumerWidget {
           // Name
           Text(
             p.name,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
+            style: AppTextStyles.bodySmall.copyWith(color: Theme.of(context).colorScheme.onSurface),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

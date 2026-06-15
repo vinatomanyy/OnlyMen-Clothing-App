@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../state/booking_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -235,10 +234,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         expandedHeight: 280,
         pinned: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
         flexibleSpace: FlexibleSpaceBar(
           background: _buildProfile(),
         ),
@@ -249,7 +245,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
       );
 
   Widget _buildProfile() => Container(
-        color: AppColors.surfaceDark,
+        color: Theme.of(context).scaffoldBackgroundColor,
         padding: const EdgeInsets.fromLTRB(20, 80, 20, 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,8 +276,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(_mockStylist.name,
-                      style:
-                          AppTextStyles.h3.copyWith(color: AppColors.white)),
+                      style: AppTextStyles.h3.copyWith(color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 2),
                   Text(_mockStylist.title,
                       style: AppTextStyles.labelSmall
@@ -330,13 +325,13 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
       );
 
   Widget _buildTabBar() => Container(
-        color: AppColors.surfaceDark,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.accent,
           indicatorWeight: 1,
-          labelColor: AppColors.white,
-          unselectedLabelColor: AppColors.grey600,
+          labelColor: Theme.of(context).colorScheme.onSurface,
+          unselectedLabelColor: AppColors.grey500,
           labelStyle: AppTextStyles.labelSmall,
           tabs: const [
             Tab(text: 'BOOKING'),
@@ -371,7 +366,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
               height: 52,
               color: (_selectedDay != null && _selectedSlot != null)
                   ? AppColors.accent
-                  : AppColors.grey800,
+                  : Theme.of(context).dividerColor,
               alignment: Alignment.center,
               child: Text(
                 'CONFIRM BOOKING',
@@ -409,7 +404,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
             Text(
               '${_monthName(_focusedMonth.month)} ${_focusedMonth.year}',
               style: AppTextStyles.labelMedium
-                  .copyWith(color: AppColors.white),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
             const Spacer(),
             GestureDetector(
@@ -474,11 +469,12 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                   color: isSelected
                       ? AppColors.accent
                       : isToday
-                          ? AppColors.grey800
+                          ? Theme.of(context).dividerColor
                           : Colors.transparent,
                   border: isToday && !isSelected
                       ? Border.all(
-                          color: AppColors.grey600, width: 1)
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                          width: 1)
                       : null,
                 ),
                 alignment: Alignment.center,
@@ -486,10 +482,10 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                   '$day',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: isPast
-                        ? AppColors.grey800
+                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25)
                         : isSelected
                             ? AppColors.black
-                            : AppColors.white,
+                            : Theme.of(context).colorScheme.onSurface,
                     fontWeight: isSelected
                         ? FontWeight.w700
                         : FontWeight.w400,
@@ -520,7 +516,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                 border: Border.all(
                   color: selected
                       ? AppColors.accent
-                      : AppColors.grey700,
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Text(
@@ -528,7 +524,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                 style: AppTextStyles.labelSmall.copyWith(
                   color: selected
                       ? AppColors.black
-                      : AppColors.grey400,
+                      : Theme.of(context).colorScheme.onSurface,
                   fontSize: 11,
                 ),
               ),
@@ -555,17 +551,16 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceDark,
-              border: Border(top: BorderSide(color: AppColors.grey800)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
             ),
             child: Row(
               children: [
                 GestureDetector(
                   onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Attachments coming soon',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black)),
+                    const SnackBar(
+                      content: Text('Attachments coming soon'),
                       backgroundColor: AppColors.accent,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -578,12 +573,12 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                 Expanded(
                   child: TextField(
                     controller: _chatController,
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                    style: AppTextStyles.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: 'Type a message...',
-                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey600),
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey500),
                       filled: true,
-                      fillColor: AppColors.grey900,
+                      fillColor: Theme.of(context).cardColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(0),
                         borderSide: BorderSide.none,
@@ -621,8 +616,8 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: AppColors.cardDark,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
               ),
               child: _TypingDots(),
             ),
@@ -658,14 +653,14 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
                         horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: msg.isAlex
-                          ? AppColors.grey800
+                          ? Theme.of(context).cardColor
                           : AppColors.accent,
                     ),
                     child: Text(
                       msg.text,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: msg.isAlex
-                            ? AppColors.white
+                            ? Theme.of(context).colorScheme.onSurface
                             : AppColors.black,
                         height: 1.5,
                       ),
@@ -703,8 +698,7 @@ class _StatChip extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style:
-                  AppTextStyles.h3.copyWith(color: AppColors.white)),
+              style: AppTextStyles.h3.copyWith(color: Theme.of(context).colorScheme.onSurface)),
           Text(sub,
               style: AppTextStyles.bodySmall
                   .copyWith(color: AppColors.grey600, fontSize: 10)),
@@ -734,7 +728,7 @@ class _BookingConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Dialog(
-        backgroundColor: AppColors.cardDark,
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -744,7 +738,7 @@ class _BookingConfirmDialog extends StatelessWidget {
             children: [
               Text('CONFIRM BOOKING',
                   style: AppTextStyles.labelLarge
-                      .copyWith(color: AppColors.white)),
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface)),
               const SizedBox(height: 16),
               _DialogRow(
                   label: 'Service',
@@ -815,7 +809,7 @@ class _DialogRow extends StatelessWidget {
                   .copyWith(color: AppColors.grey500)),
           Text(value,
               style: AppTextStyles.bodySmall
-                  .copyWith(color: AppColors.white)),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface)),
         ],
       );
 }

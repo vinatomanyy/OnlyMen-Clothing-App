@@ -11,6 +11,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/shimmer_widgets.dart';
+import '../../widgets/app_image.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -30,8 +31,28 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int _selectedColorIndex = 0;
   List<Review> _reviews = [];
   bool _descExpanded = false;
+  PageController _pageController = PageController();
 
-  final PageController _pageController = PageController();
+  int get _imagesPerColor {
+    if (_product == null || _product!.colors.isEmpty) return 1;
+    return (_product!.images.length / _product!.colors.length).floor();
+  }
+
+  List<String> get _currentColorImages {
+    if (_product == null) return [];
+    final start = _selectedColorIndex * _imagesPerColor;
+    final end = (start + _imagesPerColor).clamp(0, _product!.images.length);
+    return _product!.images.sublist(start, end);
+  }
+
+  void _selectColor(int i) {
+    _pageController.dispose();
+    _pageController = PageController();
+    setState(() {
+      _selectedColorIndex = i;
+      _currentImage = 0;
+    });
+  }
 
   @override
   void initState() {
@@ -178,12 +199,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               children: [
                 Hero(
                   tag: 'product-image-${p.id}',
-                  child: Image.network(
-                    p.images.first,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        Container(color: AppColors.grey900),
-                  ),
+                  child: AppImage(url: p.images.first, fit: BoxFit.cover),
                 ),
                 Positioned(
                   top: 0, left: 0, right: 0,
@@ -257,41 +273,35 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
       );
 
-  Widget _buildImageGallery(Product p) => SliverToBoxAdapter(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.58,
-          child: Stack(
-            children: [
-              PageView.builder(
-                controller: _pageController,
-                itemCount: p.images.length,
-                onPageChanged: (i) => setState(() => _currentImage = i),
-                itemBuilder: (_, i) => i == 0
-                    ? Hero(
-                        tag: 'product-image-${p.id}',
-                        child: Image.network(
-                          p.images[i],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: AppColors.grey900,
-                            child: const Icon(Icons.image_not_supported,
-                                color: AppColors.grey700, size: 48),
-                          ),
-                        ),
-                      )
-                    : Image.network(
-                        p.images[i],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: AppColors.grey900,
-                          child: const Icon(Icons.image_not_supported,
-                              color: AppColors.grey700, size: 48),
-                        ),
+  Widget _buildImageGallery(Product p) {
+    final images = _currentColorImages;
+    if (images.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.58,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Swipeable image slider
+            PageView.builder(
+              controller: _pageController,
+              itemCount: images.length,
+              onPageChanged: (i) => setState(() => _currentImage = i),
+              itemBuilder: (_, i) => i == 0
+                  ? Hero(
+                      tag: 'product-image-${p.id}',
+                      child: SizedBox.expand(
+                        child: AppImage(url: images[i], fit: BoxFit.cover),
                       ),
-              ),
-              // Dot indicators
+                    )
+                  : SizedBox.expand(
+                      child: AppImage(url: images[i], fit: BoxFit.cover),
+                    ),
+            ),
+
+            // Dot indicators
+            if (images.length > 1)
               Positioned(
                 bottom: 16,
                 left: 0,
@@ -299,7 +309,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    p.images.length,
+                    images.length,
                     (i) => AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -307,50 +317,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       height: 2,
                       color: _currentImage == i
                           ? AppColors.white
-                          : AppColors.grey600,
+                          : Colors.white54,
                     ),
                   ),
                 ),
               ),
-              // Thumbnail strip
-              if (p.images.length > 1)
-                Positioned(
-                  right: 12,
-                  top: 80,
-                  child: Column(
-                    children: List.generate(
-                      p.images.length,
-                      (i) => GestureDetector(
-                        onTap: () {
-                          _pageController.animateToPage(i,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          width: 44,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: _currentImage == i
-                                  ? AppColors.accent
-                                  : Colors.transparent,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Image.network(p.images[i],
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  Container(color: AppColors.grey800)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   Widget _buildHeader(Product p) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,8 +349,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 color: AppColors.black, fontSize: 9)),
                       ),
                     Text(p.name,
-                        style:
-                            AppTextStyles.h2.copyWith(color: AppColors.white)),
+                        style: AppTextStyles.h2.copyWith(color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(height: 4),
                     Text(p.brand.toUpperCase(),
                         style: AppTextStyles.labelSmall
@@ -408,8 +383,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
               const SizedBox(width: 6),
               Text('${p.rating}',
-                  style:
-                      AppTextStyles.bodySmall.copyWith(color: AppColors.white)),
+                  style: AppTextStyles.bodySmall.copyWith(color: Theme.of(context).colorScheme.onSurface)),
               Text(' (${p.reviewCount} reviews)',
                   style: AppTextStyles.bodySmall
                       .copyWith(color: AppColors.grey500)),
@@ -429,7 +403,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               const SizedBox(width: 8),
               Text(p.colors[_selectedColorIndex].name,
                   style: AppTextStyles.labelSmall
-                      .copyWith(color: AppColors.white)),
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
           const SizedBox(height: 10),
@@ -440,7 +414,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 final c = p.colors[i];
                 final selected = i == _selectedColorIndex;
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedColorIndex = i),
+                  onTap: () => _selectColor(i),
                   child: Container(
                     margin: const EdgeInsets.only(right: 10),
                     width: 28,
@@ -500,10 +474,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   width: 52,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.white : Colors.transparent,
+                    color: selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
                     border: Border.all(
-                      color:
-                          selected ? AppColors.white : AppColors.grey700,
+                      color: selected ? Theme.of(context).colorScheme.onSurface : AppColors.grey700,
                     ),
                   ),
                   alignment: Alignment.center,
@@ -568,7 +541,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               children: [
                 Text('DESCRIPTION',
                     style: AppTextStyles.labelSmall
-                        .copyWith(color: AppColors.white)),
+                        .copyWith(color: Theme.of(context).colorScheme.onSurface)),
                 const Spacer(),
                 Icon(
                   _descExpanded ? Icons.remove : Icons.add,
@@ -582,7 +555,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             const SizedBox(height: 12),
             Text(p.description,
                 style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.grey300, height: 1.7)),
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), height: 1.7)),
           ],
           const SizedBox(height: 12),
           const Divider(color: AppColors.grey800),
@@ -596,7 +569,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             children: [
               Text('REVIEWS',
                   style: AppTextStyles.labelSmall
-                      .copyWith(color: AppColors.white)),
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface)),
               const Spacer(),
               GestureDetector(
                 onTap: () =>
@@ -611,7 +584,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           Row(
             children: [
               Text(p.rating.toString(),
-                  style: AppTextStyles.h1.copyWith(color: AppColors.white)),
+                  style: AppTextStyles.h1.copyWith(color: Theme.of(context).colorScheme.onSurface)),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -662,18 +635,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Image.network(
-                            r.images.first,
+                          child: AppImage(
+                            url: r.images.first,
                             fit: BoxFit.cover,
                             width: double.infinity,
-                            errorBuilder: (_, __, ___) =>
-                                Container(color: AppColors.grey800),
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(r.name,
                             style: AppTextStyles.bodySmall
-                                .copyWith(color: AppColors.white),
+                                .copyWith(color: Theme.of(context).colorScheme.onSurface),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis),
                         Text('\$${r.price.toStringAsFixed(0)}',
@@ -706,10 +677,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.grey700),
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
-                child: const Icon(Icons.shopping_bag_outlined,
-                    color: AppColors.white, size: 20),
+                child: Icon(Icons.shopping_bag_outlined,
+                    color: Theme.of(context).colorScheme.onSurface, size: 20),
               ),
             ),
             const SizedBox(width: 12),

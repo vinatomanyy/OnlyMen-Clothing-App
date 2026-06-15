@@ -17,7 +17,9 @@ class SupabaseRepository {
           .from('products')
           .select()
           .order('created_at', ascending: false);
-      return (res as List).map((e) => Product.fromJson(e)).toList();
+      final list = (res as List).map((e) => Product.fromJson(e)).toList();
+      if (list.isEmpty) return MockRepository.getProducts();
+      return list;
     } catch (_) {
       return MockRepository.getProducts();
     }
@@ -30,7 +32,12 @@ class SupabaseRepository {
           .select()
           .eq('category', category)
           .order('created_at', ascending: false);
-      return (res as List).map((e) => Product.fromJson(e)).toList();
+      final list = (res as List).map((e) => Product.fromJson(e)).toList();
+      if (list.isEmpty) {
+        final all = await MockRepository.getProducts();
+        return all.where((p) => p.category == category).toList();
+      }
+      return list;
     } catch (_) {
       final all = await MockRepository.getProducts();
       return all.where((p) => p.category == category).toList();
@@ -43,7 +50,12 @@ class SupabaseRepository {
           .from('products')
           .select()
           .eq('is_bestseller', true);
-      return (res as List).map((e) => Product.fromJson(e)).toList();
+      final list = (res as List).map((e) => Product.fromJson(e)).toList();
+      if (list.isEmpty) {
+        final all = await MockRepository.getProducts();
+        return all.where((p) => p.isBestseller).toList();
+      }
+      return list;
     } catch (_) {
       final all = await MockRepository.getProducts();
       return all.where((p) => p.isBestseller).toList();
@@ -56,7 +68,12 @@ class SupabaseRepository {
           .from('products')
           .select()
           .eq('is_new', true);
-      return (res as List).map((e) => Product.fromJson(e)).toList();
+      final list = (res as List).map((e) => Product.fromJson(e)).toList();
+      if (list.isEmpty) {
+        final all = await MockRepository.getProducts();
+        return all.where((p) => p.isNew).toList();
+      }
+      return list;
     } catch (_) {
       final all = await MockRepository.getProducts();
       return all.where((p) => p.isNew).toList();

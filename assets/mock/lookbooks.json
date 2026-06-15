@@ -3,30 +3,30 @@
     "id": "l001",
     "title": "The Urban Edit",
     "image_url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200",
-    "product_ids": ["p001", "p002", "p010"]
+    "product_ids": ["p001", "p010", "p022"]
   },
   {
     "id": "l002",
     "title": "Smart Casual",
     "image_url": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=1200",
-    "product_ids": ["p007", "p009", "p006"]
+    "product_ids": ["p006", "p009", "p011"]
   },
   {
     "id": "l003",
     "title": "Weekend Warrior",
     "image_url": "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200",
-    "product_ids": ["p005", "p016", "p010"]
+    "product_ids": ["p012", "p017", "p021"]
   },
   {
     "id": "l004",
     "title": "The Winter Layer",
     "image_url": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200",
-    "product_ids": ["p012", "p003", "p017"]
+    "product_ids": ["p015", "p019", "p014"]
   },
   {
     "id": "l005",
     "title": "Business Refined",
     "image_url": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200",
-    "product_ids": ["p001", "p009", "p006", "p008"]
+    "product_ids": ["p005", "p006", "p018", "p008"]
   }
 ]

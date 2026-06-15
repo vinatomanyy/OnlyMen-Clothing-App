@@ -1,458 +1,371 @@
 [
   {
     "id": "p001",
-    "name": "Essential White Oxford",
+    "name": "Essential Crew Tee",
     "brand": "OnlyMen",
-    "category": "shirts",
-    "price": 89.99,
-    "original_price": 120.00,
-    "description": "A timeless white oxford shirt crafted from 100% Egyptian cotton. Perfect for both formal and casual occasions. Features a classic button-down collar and a tailored fit that flatters every body type.",
+    "category": "tshirts",
+    "price": 12.00,
+    "description": "A no-fuss everyday tee cut from soft combed cotton. Clean crew neck, relaxed fit — the kind you reach for without thinking.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "White", "hex": "#FFFFFF"},
-      {"name": "Light Blue", "hex": "#AEC6CF"},
-      {"name": "Navy", "hex": "#0D1B2A"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800",
-      "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=800",
-      "https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=800"
-    ],
-    "rating": 4.8,
-    "review_count": 124,
-    "is_new": false,
-    "is_bestseller": true
+    "colors": [{"name": "White", "hex": "#FFFFFF"}],
+    "images": ["assets/images/tshirt1.jpg", "assets/images/tshirt2.jpg"],
+    "rating": 4.5,
+    "review_count": 89,
+    "is_new": true,
+    "is_bestseller": false
   },
   {
     "id": "p002",
-    "name": "Slim Fit Navy Chinos",
+    "name": "Boxy Drop-Shoulder Tee",
     "brand": "OnlyMen",
-    "category": "pants",
-    "price": 74.99,
-    "original_price": null,
-    "description": "Slim fit chinos in a rich navy colorway. Made from a cotton-stretch blend for all-day comfort. Versatile enough for the office or weekend outings.",
+    "category": "tshirts",
+    "price": 18.00,
+    "description": "Oversized silhouette with dropped shoulders and a boxy cut. Made from heavyweight cotton that holds its shape wash after wash.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Navy", "hex": "#0D1B2A"},
-      {"name": "Khaki", "hex": "#C3B091"},
-      {"name": "Olive", "hex": "#6B7C5C"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800",
-      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800"
-    ],
-    "rating": 4.5,
-    "review_count": 89,
-    "is_new": false,
-    "is_bestseller": true
+    "colors": [{"name": "Off White", "hex": "#F5F0E8"}],
+    "images": ["assets/images/boxytshirt1.jpg", "assets/images/boxytshirt2.jpg"],
+    "rating": 4.3,
+    "review_count": 54,
+    "is_new": true,
+    "is_bestseller": false
   },
   {
     "id": "p003",
-    "name": "Merino Wool Crewneck",
-    "brand": "OnlyMen",
-    "category": "shirts",
-    "price": 129.99,
-    "original_price": 160.00,
-    "description": "Ultra-fine merino wool crewneck sweater. Naturally temperature-regulating, soft against the skin, and resistant to odor. A wardrobe essential for every season.",
-    "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Charcoal", "hex": "#36454F"},
-      {"name": "Camel", "hex": "#C19A6B"},
-      {"name": "Burgundy", "hex": "#800020"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800",
-      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800"
-    ],
-    "rating": 4.9,
-    "review_count": 210,
-    "is_new": true,
-    "is_bestseller": false
-  },
-  {
-    "id": "p004",
-    "name": "Technical Field Jacket",
-    "brand": "OnlyMen",
-    "category": "jackets",
-    "price": 249.99,
-    "original_price": 320.00,
-    "description": "A modern take on the classic field jacket. Water-resistant shell, multiple utility pockets, and a removable liner make this the ultimate transitional outerwear piece.",
-    "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Olive", "hex": "#6B7C5C"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Tan", "hex": "#D2B48C"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800",
-      "https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=800"
-    ],
-    "rating": 4.7,
-    "review_count": 67,
-    "is_new": true,
-    "is_bestseller": false
-  },
-  {
-    "id": "p005",
-    "name": "Classic White Tee",
+    "name": "Chest Pocket Tee",
     "brand": "OnlyMen",
     "category": "tshirts",
-    "price": 39.99,
-    "original_price": null,
-    "description": "The perfect white t-shirt. Heavyweight 200gsm cotton, pre-shrunk, with a boxy fit that sits just right. The foundation of any great outfit.",
+    "price": 14.00,
+    "description": "The classic tee with one small upgrade — a single chest pocket that adds just enough detail without overthinking it.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "White", "hex": "#FFFFFF"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Grey", "hex": "#9E9E9E"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
-      "https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=800"
-    ],
-    "rating": 4.6,
-    "review_count": 345,
+    "colors": [{"name": "White", "hex": "#FFFFFF"}],
+    "images": ["assets/images/pockettee1.jpg", "assets/images/pockettee2.jpg"],
+    "rating": 4.4,
+    "review_count": 67,
     "is_new": false,
     "is_bestseller": true
   },
   {
-    "id": "p006",
-    "name": "Leather Derby Shoes",
+    "id": "p004",
+    "name": "Crew Neck Cotton Tee",
     "brand": "OnlyMen",
-    "category": "shoes",
-    "price": 189.99,
-    "original_price": 240.00,
-    "description": "Full-grain leather derby shoes with a Goodyear-welted sole. Handcrafted for durability and elegance. Pairs effortlessly with chinos or tailored trousers.",
-    "sizes": ["40", "41", "42", "43", "44", "45"],
+    "category": "tshirts",
+    "price": 16.00,
+    "description": "Our bestselling crew neck in two clean colourways. Breathable cotton, consistent fit, never goes out of style.",
+    "sizes": ["S", "M", "L", "XL"],
     "colors": [
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Tan", "hex": "#D2B48C"},
-      {"name": "Dark Brown", "hex": "#3B1F0A"}
+      {"name": "White", "hex": "#FFFFFF"},
+      {"name": "Grey", "hex": "#9E9E9E"}
     ],
     "images": [
-      "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=800",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
+      "assets/images/cnecktshirt1white.jpg",
+      "assets/images/cnecktshirt2white.jpg",
+      "assets/images/cnecktshirt3grey.jpg",
+      "assets/images/cnecktshirt4grey.jpg"
     ],
-    "rating": 4.8,
+    "rating": 4.7,
     "review_count": 156,
     "is_new": false,
     "is_bestseller": true
   },
   {
-    "id": "p007",
-    "name": "Linen Blend Blazer",
+    "id": "p005",
+    "name": "Classic Dress Shirt",
     "brand": "OnlyMen",
-    "category": "jackets",
-    "price": 219.99,
-    "original_price": null,
-    "description": "A lightweight linen-blend blazer perfect for warm weather occasions. Unstructured for a relaxed silhouette, with patch pockets and a breathable fabric that keeps you cool.",
+    "category": "shirts",
+    "price": 25.00,
+    "description": "Crisp poplin weave, spread collar, clean button placket. Sharp enough for a meeting, relaxed enough to wear untucked.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Beige", "hex": "#F5F5DC"},
-      {"name": "Navy", "hex": "#0D1B2A"},
-      {"name": "Light Grey", "hex": "#D3D3D3"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800",
-      "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=800"
-    ],
-    "rating": 4.4,
-    "review_count": 43,
+    "colors": [{"name": "White", "hex": "#FFFFFF"}],
+    "images": ["assets/images/dressshirt1.jpg", "assets/images/dressshirt2.jpg"],
+    "rating": 4.6,
+    "review_count": 112,
+    "is_new": true,
+    "is_bestseller": false
+  },
+  {
+    "id": "p006",
+    "name": "Oxford Weave Shirt",
+    "brand": "OnlyMen",
+    "category": "shirts",
+    "price": 22.00,
+    "description": "Oxford cotton with a button-down collar that stays put. Tuck it into trousers or leave it out over denim — works either way.",
+    "sizes": ["S", "M", "L", "XL"],
+    "colors": [{"name": "Light Blue", "hex": "#AEC6CF"}],
+    "images": ["assets/images/oxfordshirt1.jpg", "assets/images/oxfordshirt2.jpg"],
+    "rating": 4.8,
+    "review_count": 203,
+    "is_new": false,
+    "is_bestseller": true
+  },
+  {
+    "id": "p007",
+    "name": "Relaxed Fit Shirt",
+    "brand": "OnlyMen",
+    "category": "shirts",
+    "price": 20.00,
+    "description": "Easy, lived-in fit with a full button front. Wear it open as a layer or buttoned up on its own — equally good both ways.",
+    "sizes": ["S", "M", "L", "XL"],
+    "colors": [{"name": "White", "hex": "#FFFFFF"}],
+    "images": ["assets/images/relaxedshirt1.jpg", "assets/images/relaxedshirt2.jpg"],
+    "rating": 4.3,
+    "review_count": 78,
     "is_new": true,
     "is_bestseller": false
   },
   {
     "id": "p008",
-    "name": "Leather Bifold Wallet",
+    "name": "Camp Collar Short Sleeve",
     "brand": "OnlyMen",
-    "category": "accessories",
-    "price": 59.99,
-    "original_price": 80.00,
-    "description": "Slim bifold wallet in full-grain leather. Holds up to 8 cards with a central cash compartment. Ages beautifully with use.",
-    "sizes": ["One Size"],
-    "colors": [
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Tan", "hex": "#D2B48C"},
-      {"name": "Dark Brown", "hex": "#3B1F0A"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1627123424574-724758594913?w=800",
-      "https://images.unsplash.com/photo-1606503153255-59d5e417b8b5?w=800"
-    ],
-    "rating": 4.7,
-    "review_count": 278,
+    "category": "shirts",
+    "price": 18.00,
+    "description": "Open camp collar, short sleeves, relaxed body. The shirt that makes casual look considered — pairs with anything in your wardrobe.",
+    "sizes": ["S", "M", "L", "XL"],
+    "colors": [{"name": "Sand", "hex": "#D4B483"}],
+    "images": ["assets/images/shortshirt1.jpg", "assets/images/shortshirt2.jpg"],
+    "rating": 4.5,
+    "review_count": 91,
     "is_new": false,
     "is_bestseller": true
   },
   {
     "id": "p009",
-    "name": "Slim Suit Trousers",
+    "name": "Cotton Piqué Polo",
     "brand": "OnlyMen",
-    "category": "pants",
-    "price": 109.99,
-    "original_price": 140.00,
-    "description": "Tailored slim-fit trousers in a wool-blend fabric. Features a flat front, belt loops, and a clean hem. The perfect match for our linen blazer or worn solo with a tucked shirt.",
+    "category": "shirts",
+    "price": 20.00,
+    "description": "Breathable piqué knit with a two-button placket. Smart without trying too hard — comes in grey and brown.",
     "sizes": ["S", "M", "L", "XL"],
     "colors": [
-      {"name": "Charcoal", "hex": "#36454F"},
-      {"name": "Navy", "hex": "#0D1B2A"},
-      {"name": "Black", "hex": "#0A0A0A"}
+      {"name": "Grey", "hex": "#9E9E9E"},
+      {"name": "Brown", "hex": "#795548"}
     ],
     "images": [
-      "https://images.unsplash.com/photo-1519748771451-a94c596fad67?w=800",
-      "https://images.unsplash.com/photo-1532453288672-3a17f2e980ae?w=800"
+      "assets/images/polocotton1grey.jpg",
+      "assets/images/polocotton2grey.jpg",
+      "assets/images/polocotton3brown.jpg",
+      "assets/images/polocotton4brown.jpg"
     ],
-    "rating": 4.5,
-    "review_count": 92,
-    "is_new": false,
-    "is_bestseller": false
-  },
-  {
-    "id": "p010",
-    "name": "Minimalist Canvas Sneakers",
-    "brand": "OnlyMen",
-    "category": "shoes",
-    "price": 79.99,
-    "original_price": null,
-    "description": "Clean, minimal canvas sneakers with a vulcanized rubber sole. Low-profile silhouette that pairs with anything from joggers to chinos.",
-    "sizes": ["40", "41", "42", "43", "44", "45"],
-    "colors": [
-      {"name": "White", "hex": "#FFFFFF"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Navy", "hex": "#0D1B2A"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=800",
-      "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800"
-    ],
-    "rating": 4.3,
-    "review_count": 187,
+    "rating": 4.6,
+    "review_count": 134,
     "is_new": false,
     "is_bestseller": true
   },
   {
-    "id": "p011",
-    "name": "Graphic Print Tee",
+    "id": "p010",
+    "name": "Knit Collar Polo",
     "brand": "OnlyMen",
-    "category": "tshirts",
-    "price": 49.99,
-    "original_price": null,
-    "description": "Editorial graphic tee with a bold minimalist print. Screen-printed on heavyweight 220gsm cotton. Limited edition design.",
+    "category": "shirts",
+    "price": 22.00,
+    "description": "Fine knit construction gives this polo a softer, more premium feel than standard cotton. A quiet step up from the everyday.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "White", "hex": "#FFFFFF"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800",
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800"
-    ],
-    "rating": 4.6,
-    "review_count": 63,
+    "colors": [{"name": "Navy", "hex": "#0D1B2A"}],
+    "images": ["assets/images/poloknit1.jpg", "assets/images/poloknit2.jpg"],
+    "rating": 4.4,
+    "review_count": 48,
     "is_new": true,
     "is_bestseller": false
   },
   {
+    "id": "p011",
+    "name": "Fine Knit Polo",
+    "brand": "OnlyMen",
+    "category": "shirts",
+    "price": 25.00,
+    "description": "Lightweight fine-gauge knit with a ribbed collar and cuffs. Sits between casual and smart — the kind of piece that pulls an outfit together.",
+    "sizes": ["S", "M", "L", "XL"],
+    "colors": [{"name": "Grey", "hex": "#9E9E9E"}],
+    "images": ["assets/images/polowool1.jpg", "assets/images/polowool2.jpg"],
+    "rating": 4.7,
+    "review_count": 167,
+    "is_new": false,
+    "is_bestseller": true
+  },
+  {
     "id": "p012",
-    "name": "Wool Overcoat",
+    "name": "Cotton Zip Jacket",
     "brand": "OnlyMen",
     "category": "jackets",
-    "price": 389.99,
-    "original_price": 480.00,
-    "description": "A statement overcoat in a double-faced wool blend. Features a notched lapel, hidden button closure, and side pockets. The ultimate cold-weather investment piece.",
+    "price": 35.00,
+    "description": "Washed cotton with a full-length zip and clean lines. Light enough for the in-between seasons, structured enough to look intentional.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Camel", "hex": "#C19A6B"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Grey", "hex": "#9E9E9E"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1539533018257-e8e44d8b0a94?w=800",
-      "https://images.unsplash.com/photo-1520975954732-35dd22299614?w=800"
-    ],
-    "rating": 4.9,
-    "review_count": 34,
+    "colors": [{"name": "Olive", "hex": "#6B7A3D"}],
+    "images": ["assets/images/cottonjacket1.jpg", "assets/images/cottonjacket2.jpg"],
+    "rating": 4.5,
+    "review_count": 73,
     "is_new": true,
     "is_bestseller": false
   },
   {
     "id": "p013",
-    "name": "Silk Pocket Square",
+    "name": "Utility Overjacket",
     "brand": "OnlyMen",
-    "category": "accessories",
-    "price": 29.99,
-    "original_price": null,
-    "description": "100% pure silk pocket square with a hand-rolled edge. Adds instant elegance to any blazer or suit. Available in classic patterns.",
-    "sizes": ["One Size"],
-    "colors": [
-      {"name": "Navy", "hex": "#0D1B2A"},
-      {"name": "Burgundy", "hex": "#800020"},
-      {"name": "Gold", "hex": "#D4A853"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800"
-    ],
-    "rating": 4.5,
-    "review_count": 45,
-    "is_new": false,
+    "category": "jackets",
+    "price": 40.00,
+    "description": "A clean utilitarian jacket with zip pockets and a minimal silhouette. Goes over anything and finishes the look every time.",
+    "sizes": ["S", "M", "L", "XL"],
+    "colors": [{"name": "Black", "hex": "#1A1A1A"}],
+    "images": ["assets/images/jacket1.jpg", "assets/images/jacket2.jpg"],
+    "rating": 4.6,
+    "review_count": 95,
+    "is_new": true,
     "is_bestseller": false
   },
   {
     "id": "p014",
-    "name": "Relaxed Linen Shirt",
+    "name": "Denim Trucker Jacket",
     "brand": "OnlyMen",
-    "category": "shirts",
-    "price": 94.99,
-    "original_price": null,
-    "description": "Relaxed-fit linen shirt with a camp collar. Perfect for warm climates and casual settings. The natural linen texture gives it an effortless, lived-in look.",
+    "category": "jackets",
+    "price": 38.00,
+    "description": "Rigid indigo denim, structured cut, contrast stitching. The trucker jacket that only gets better the more you wear it.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Sand", "hex": "#C2B280"},
-      {"name": "White", "hex": "#FFFFFF"},
-      {"name": "Sage", "hex": "#B2AC88"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800",
-      "https://images.unsplash.com/photo-1589310243389-96a5483213a8?w=800"
-    ],
-    "rating": 4.4,
-    "review_count": 78,
+    "colors": [{"name": "Indigo", "hex": "#3A5F8A"}],
+    "images": ["assets/images/truckerjacket1.jpg", "assets/images/truckerjacket2.jpg"],
+    "rating": 4.8,
+    "review_count": 189,
     "is_new": false,
-    "is_bestseller": false
+    "is_bestseller": true
   },
   {
     "id": "p015",
-    "name": "Leather Belt",
+    "name": "Structured Wool Jacket",
     "brand": "OnlyMen",
-    "category": "accessories",
-    "price": 49.99,
-    "original_price": 65.00,
-    "description": "Full-grain leather belt with a polished gunmetal buckle. 35mm width, suitable for both casual and dress trousers. Built to last a lifetime.",
+    "category": "jackets",
+    "price": 40.00,
+    "description": "Tailored in a premium wool blend with clean lapels and a half-lining. The jacket that makes everything else in your wardrobe work harder.",
     "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Tan", "hex": "#D2B48C"},
-      {"name": "Dark Brown", "hex": "#3B1F0A"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=800"
-    ],
-    "rating": 4.6,
-    "review_count": 112,
+    "colors": [{"name": "Charcoal", "hex": "#37474F"}],
+    "images": ["assets/images/wooljacket1.jpg", "assets/images/wooljacket2.jpg"],
+    "rating": 4.9,
+    "review_count": 234,
     "is_new": false,
     "is_bestseller": true
   },
   {
     "id": "p016",
-    "name": "Cargo Joggers",
+    "name": "Slim Black Jean",
     "brand": "OnlyMen",
     "category": "pants",
-    "price": 84.99,
-    "original_price": null,
-    "description": "Modern cargo joggers with a tapered fit. Features multiple utility pockets, an elasticated waistband, and a French terry fabric for maximum comfort.",
-    "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Olive", "hex": "#6B7C5C"},
-      {"name": "Grey", "hex": "#9E9E9E"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800"
-    ],
-    "rating": 4.3,
-    "review_count": 56,
-    "is_new": true,
-    "is_bestseller": false
+    "price": 25.00,
+    "description": "Clean black denim in a slim cut with minimal distressing. Dresses up or down — the jean you keep reaching for.",
+    "sizes": ["28", "30", "32", "34", "36"],
+    "colors": [{"name": "Black", "hex": "#1A1A1A"}],
+    "images": ["assets/images/blackjean1.jpg", "assets/images/blackjean2.jpg"],
+    "rating": 4.6,
+    "review_count": 178,
+    "is_new": false,
+    "is_bestseller": true
   },
   {
     "id": "p017",
-    "name": "Suede Chelsea Boots",
+    "name": "Straight Blue Jean",
     "brand": "OnlyMen",
-    "category": "shoes",
-    "price": 219.99,
-    "original_price": 280.00,
-    "description": "Premium suede Chelsea boots with an elastic side panel and pull tab. Leather-lined for comfort and durability. A versatile boot that elevates any outfit.",
-    "sizes": ["40", "41", "42", "43", "44", "45"],
-    "colors": [
-      {"name": "Tan", "hex": "#D2B48C"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Navy", "hex": "#0D1B2A"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=800",
-      "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=800"
-    ],
+    "category": "pants",
+    "price": 22.00,
+    "description": "Medium-weight denim in a clean mid-wash. Straight leg, consistent fit — a pair of jeans that earns its place and stays there.",
+    "sizes": ["28", "30", "32", "34", "36"],
+    "colors": [{"name": "Mid Blue", "hex": "#3A5F8A"}],
+    "images": ["assets/images/bluejean1.jpg", "assets/images/bluejean2.jpg"],
     "rating": 4.7,
-    "review_count": 93,
+    "review_count": 215,
     "is_new": false,
     "is_bestseller": true
   },
   {
     "id": "p018",
-    "name": "Denim Trucker Jacket",
+    "name": "Tapered Cotton Trouser",
     "brand": "OnlyMen",
-    "category": "jackets",
-    "price": 159.99,
-    "original_price": null,
-    "description": "Classic denim trucker jacket in a mid-wash indigo. Features a button front, chest pockets, and a slightly cropped silhouette. A streetwear staple.",
-    "sizes": ["S", "M", "L", "XL"],
-    "colors": [
-      {"name": "Indigo", "hex": "#4B0082"},
-      {"name": "Black", "hex": "#0A0A0A"},
-      {"name": "Light Wash", "hex": "#ADD8E6"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1601333144130-8cbb312386b6?w=800",
-      "https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=800"
-    ],
+    "category": "pants",
+    "price": 28.00,
+    "description": "Soft cotton blend with an elasticated waistband and a tapered leg. Smart enough to wear to work, comfortable enough to wear everywhere else.",
+    "sizes": ["28", "30", "32", "34", "36"],
+    "colors": [{"name": "Sand", "hex": "#D4B483"}],
+    "images": ["assets/images/cottontrouser1.jpg", "assets/images/cottontrouser2.jpg"],
     "rating": 4.5,
-    "review_count": 71,
+    "review_count": 142,
     "is_new": false,
-    "is_bestseller": false
+    "is_bestseller": true
   },
   {
     "id": "p019",
-    "name": "Cashmere Scarf",
+    "name": "Tailored Wool Trouser",
     "brand": "OnlyMen",
-    "category": "accessories",
-    "price": 99.99,
-    "original_price": 130.00,
-    "description": "Pure cashmere scarf, woven in Scotland. Exceptionally soft with a generous size for multiple styling options. A luxury accessory at an accessible price.",
-    "sizes": ["One Size"],
-    "colors": [
-      {"name": "Camel", "hex": "#C19A6B"},
-      {"name": "Navy", "hex": "#0D1B2A"},
-      {"name": "Charcoal", "hex": "#36454F"}
-    ],
-    "images": [
-      "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=800"
-    ],
+    "category": "pants",
+    "price": 30.00,
+    "description": "Flat-front, tapered leg, fine wool blend. The trouser that makes a simple shirt look like an outfit — clean break at the ankle.",
+    "sizes": ["28", "30", "32", "34", "36"],
+    "colors": [{"name": "Charcoal", "hex": "#37474F"}],
+    "images": ["assets/images/wooltrouser1.jpg", "assets/images/wooltrouser2.jpg"],
     "rating": 4.8,
-    "review_count": 38,
-    "is_new": false,
+    "review_count": 87,
+    "is_new": true,
     "is_bestseller": false
   },
   {
     "id": "p020",
-    "name": "Striped Breton Tee",
+    "name": "Chelsea Leather Boot",
     "brand": "OnlyMen",
-    "category": "tshirts",
-    "price": 54.99,
-    "original_price": null,
-    "description": "Classic Breton-stripe tee in a navy and white colorway. Made from a soft cotton-modal blend for all-day comfort. A timeless piece with a nautical edge.",
-    "sizes": ["S", "M", "L", "XL"],
+    "category": "shoes",
+    "price": 35.00,
+    "description": "Full-grain leather upper, elastic side gussets, stacked sole. Built to last and built to be worn — in or out of the office.",
+    "sizes": ["40", "41", "42", "43", "44", "45"],
+    "colors": [{"name": "Tan", "hex": "#8D6E63"}],
+    "images": ["assets/images/boot1.jpg", "assets/images/boot2.jpg"],
+    "rating": 4.7,
+    "review_count": 103,
+    "is_new": true,
+    "is_bestseller": false
+  },
+  {
+    "id": "p021",
+    "name": "Court Leather Sneaker",
+    "brand": "OnlyMen",
+    "category": "shoes",
+    "price": 30.00,
+    "description": "Low-profile court silhouette in smooth leather with tonal laces and a cushioned insole. The white sneaker that goes with everything.",
+    "sizes": ["40", "41", "42", "43", "44", "45"],
+    "colors": [{"name": "White", "hex": "#FFFFFF"}],
+    "images": ["assets/images/sneaker1.jpg", "assets/images/sneaker2.jpg"],
+    "rating": 4.5,
+    "review_count": 156,
+    "is_new": true,
+    "is_bestseller": false
+  },
+  {
+    "id": "p022",
+    "name": "Minimal Carry Backpack",
+    "brand": "OnlyMen",
+    "category": "accessories",
+    "price": 25.00,
+    "description": "Structured profile, padded laptop sleeve, matte hardware. Keeps things organised without making a noise about it.",
+    "sizes": ["One Size"],
+    "colors": [{"name": "Black", "hex": "#1A1A1A"}],
+    "images": ["assets/images/backpack1.jpg", "assets/images/backpack2.jpg"],
+    "rating": 4.6,
+    "review_count": 201,
+    "is_new": false,
+    "is_bestseller": true
+  },
+  {
+    "id": "p023",
+    "name": "Structured Cap",
+    "brand": "OnlyMen",
+    "category": "accessories",
+    "price": 15.00,
+    "description": "Six-panel construction with a pre-curved brim and adjustable back strap. Available in black and white — both work with everything.",
+    "sizes": ["One Size"],
     "colors": [
-      {"name": "Navy/White", "hex": "#0D1B2A"},
-      {"name": "Black/White", "hex": "#0A0A0A"}
+      {"name": "Black", "hex": "#1A1A1A"},
+      {"name": "White", "hex": "#FFFFFF"}
     ],
     "images": [
-      "https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=800",
-      "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800"
+      "assets/images/hat1black.jpg",
+      "assets/images/hat2black.jpg",
+      "assets/images/hat3white.jpg",
+      "assets/images/hat4white.jpg"
     ],
     "rating": 4.4,
-    "review_count": 129,
+    "review_count": 89,
     "is_new": false,
-    "is_bestseller": false
+    "is_bestseller": true
   }
 ]

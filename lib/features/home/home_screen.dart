@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../widgets/app_image.dart';
 import '../../models/product.dart';
 import '../../state/products_provider.dart';
 import '../../state/promotions_provider.dart';
@@ -22,8 +22,9 @@ class HomeScreen extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           _AppBar(),
-          const SliverToBoxAdapter(child: _HeroSection()),
           SliverToBoxAdapter(child: _PromotionsStrip(ref: ref)),
+          const SliverToBoxAdapter(child: _HeroSection()),
+          SliverToBoxAdapter(child: _BestsellersSection(ref: ref)),
           SliverToBoxAdapter(child: _NewArrivalsSection(ref: ref)),
           const SliverToBoxAdapter(child: _CategoriesSection()),
           const SliverToBoxAdapter(child: SizedBox(height: 32)),
@@ -46,21 +47,17 @@ class _AppBar extends ConsumerWidget {
       backgroundColor: bg,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.menu, color: fg),
-        onPressed: () {},
+        icon: Icon(
+          isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+          color: fg,
+        ),
+        onPressed: () => ref.read(themeProvider.notifier).toggle(),
       ),
       title: Text(
         'OnlyMen',
         style: AppTextStyles.h2.copyWith(color: fg, letterSpacing: 2),
       ),
       actions: [
-        IconButton(
-          icon: Icon(
-            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-            color: fg,
-          ),
-          onPressed: () => ref.read(themeProvider.notifier).toggle(),
-        ),
         IconButton(
           icon: Icon(Icons.shopping_bag_outlined, color: fg),
           onPressed: () => context.push('/cart'),
@@ -84,24 +81,21 @@ class _HeroSectionState extends State<_HeroSection> {
 
   final List<Map<String, String>> _slides = [
     {
-      'image':
-          'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=800',
+      'image': 'assets/images/home1.jpg',
       'tag': 'EDITORIAL FEATURE',
-      'title': 'The Architecture\nof Winter',
+      'title': 'Architecture of\nYour Own Style.',
       'cta': 'Shop the Look',
       'category': 'jackets',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800',
+      'image': 'assets/images/home2.jpg',
       'tag': 'NEW COLLECTION',
-      'title': 'Sharp Minds,\nSharp Suits',
+      'title': 'Breeze of\nthe Summer.',
       'cta': 'Explore Now',
       'category': 'shirts',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=800',
+      'image': 'assets/images/home3.jpg',
       'tag': 'LOOKBOOK 2026',
       'title': 'Minimal.\nTimeless.',
       'cta': 'View Lookbook',
@@ -149,13 +143,7 @@ class _HeroSectionState extends State<_HeroSection> {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: slide['image']!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: AppColors.grey200,
-                    ),
-                  ),
+                  AppImage(url: slide['image']!, fit: BoxFit.cover),
                   Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -264,42 +252,42 @@ class _PromotionsStrip extends StatelessWidget {
       data: (promos) {
         if (promos.isEmpty) return const SizedBox.shrink();
         final promo = promos.first;
-        return Container(
-          color: AppColors.black,
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Row(
-            children: [
-              const Icon(Icons.local_offer_outlined,
-                  color: AppColors.accent, size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${promo.title} — Use code ',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.white,
+        return GestureDetector(
+          onTap: () => context.push('/promotions'),
+          child: Container(
+            color: AppColors.black,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.local_offer_outlined,
+                    color: AppColors.accent, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${promo.title} — Use code ',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.white,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 2),
-                color: AppColors.accent,
-                child: Text(
-                  promo.code,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.black,
-                    letterSpacing: 1.5,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 2),
+                  color: AppColors.accent,
+                  child: Text(
+                    promo.code,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.black,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => context.push('/promotions'),
-                child: const Icon(Icons.arrow_forward_ios,
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_ios,
                     color: AppColors.white, size: 12),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -308,6 +296,77 @@ class _PromotionsStrip extends StatelessWidget {
         height: 40,
       ),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+// ── Bestsellers ───────────────────────────────────────────────
+class _BestsellersSection extends StatelessWidget {
+  final WidgetRef ref;
+  const _BestsellersSection({required this.ref});
+
+  @override
+  Widget build(BuildContext context) {
+    final products = ref.watch(bestsellersProvider);
+    return Padding(
+      padding: const EdgeInsets.only(top: 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Best Sellers', style: AppTextStyles.h3),
+                GestureDetector(
+                  onTap: () => context.push('/category/all'),
+                  child: Text(
+                    'View All',
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.grey500,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 280,
+            child: products.when(
+              data: (items) {
+                final capped = items.take(4).toList();
+                if (capped.isEmpty) return const _EmptyProducts();
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    const gap = 8.0;
+                    const hPad = 20.0;
+                    final cardWidth =
+                        (constraints.maxWidth - hPad * 2 - gap * 3) / 4;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: hPad),
+                      child: Row(
+                        children: List.generate(capped.length, (i) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _ProductCard(product: capped[i], width: cardWidth),
+                            if (i < capped.length - 1)
+                              const SizedBox(width: gap),
+                          ],
+                        )),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const _ShimmerProductList(),
+              error: (_, __) => const _EmptyProducts(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -348,16 +407,31 @@ class _NewArrivalsSection extends StatelessWidget {
           SizedBox(
             height: 280,
             child: products.when(
-              data: (items) => items.isEmpty
-                  ? const _EmptyProducts()
-                  : ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) =>
-                          _ProductCard(product: items[index]),
-                    ),
+              data: (items) {
+                final capped = items.take(4).toList();
+                if (capped.isEmpty) return const _EmptyProducts();
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    const gap = 8.0;
+                    const hPad = 20.0;
+                    final cardWidth =
+                        (constraints.maxWidth - hPad * 2 - gap * 3) / 4;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: hPad),
+                      child: Row(
+                        children: List.generate(capped.length, (i) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _ProductCard(product: capped[i], width: cardWidth),
+                            if (i < capped.length - 1)
+                              const SizedBox(width: gap),
+                          ],
+                        )),
+                      ),
+                    );
+                  },
+                );
+              },
               loading: () => const _ShimmerProductList(),
               error: (_, __) => const _EmptyProducts(),
             ),
@@ -371,15 +445,15 @@ class _NewArrivalsSection extends StatelessWidget {
 // ── Product Card ─────────────────────────────────────────────
 class _ProductCard extends StatelessWidget {
   final Product product;
-  const _ProductCard({required this.product});
+  final double? width;
+  const _ProductCard({required this.product, this.width});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
-      child: Container(
-        width: 180,
-        margin: const EdgeInsets.only(right: 16),
+      child: SizedBox(
+        width: width,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -390,21 +464,12 @@ class _ProductCard extends StatelessWidget {
                     tag: 'product-image-${product.id}',
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(2),
-                      child: CachedNetworkImage(
-                        imageUrl: product.images.isNotEmpty
-                            ? product.images.first
-                            : '',
-                        width: 180,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: AppColors.grey200,
-                          highlightColor: AppColors.grey100,
-                          child: Container(color: AppColors.grey200),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: AppColors.grey100,
-                          child: const Icon(Icons.image_outlined,
-                              color: AppColors.grey400),
+                      child: SizedBox.expand(
+                        child: AppImage(
+                          url: product.images.isNotEmpty
+                              ? product.images.first
+                              : '',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -468,76 +533,67 @@ class _ProductCard extends StatelessWidget {
 class _CategoriesSection extends StatelessWidget {
   const _CategoriesSection();
 
-  @override
-  Widget build(BuildContext context) {
-    const categories = [
-      {'label': 'Apparel', 'icon': Icons.checkroom_outlined, 'value': 'shirts'},
-      {'label': 'Footwear', 'icon': Icons.accessibility_outlined, 'value': 'shoes'},
-      {'label': 'Accessories', 'icon': Icons.watch_outlined, 'value': 'accessories'},
-      {'label': 'Premium', 'icon': Icons.diamond_outlined, 'value': 'jackets'},
-    ];
-
-    return Builder(builder: (context) => Padding(
-      padding: EdgeInsets.only(
-          top: 32,
-          left: Responsive.horizontalPadding(context),
-          right: Responsive.horizontalPadding(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Explore Collection', style: AppTextStyles.h3),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: categories
-                .map((cat) => _CategoryItem(
-                      label: cat['label'] as String,
-                      icon: cat['icon'] as IconData,
-                      onTap: () => context.push('/category/${cat['value']}'),
-                    ))
-                .toList(),
-          ),
-        ],
-      ),
-    ));
-  }
-}
-
-class _CategoryItem extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _CategoryItem({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
+  static const _categories = [
+    {'label': 'Shirts',      'value': 'shirts',      'icon': Icons.checkroom_outlined},
+    {'label': 'Jackets',     'value': 'jackets',     'icon': Icons.layers_outlined},
+    {'label': 'Footwear',    'value': 'shoes',       'icon': Icons.hiking_outlined},
+    {'label': 'Accessories', 'value': 'accessories', 'icon': Icons.watch_outlined},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 28),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            Responsive.horizontalPadding(context),
+            32,
+            Responsive.horizontalPadding(context),
+            16,
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.grey600,
-            ),
+          child: const Text('Explore by Category', style: AppTextStyles.h3),
+        ),
+        SizedBox(
+          height: 110,
+          child: Row(
+            children: _categories.map((cat) {
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => context.push('/category/${cat['value']}'),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          cat['icon'] as IconData,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 26,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          cat['label'] as String,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            letterSpacing: 1.5,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
