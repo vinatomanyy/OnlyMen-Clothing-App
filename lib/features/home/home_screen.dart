@@ -22,10 +22,10 @@ class HomeScreen extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           _AppBar(),
-          SliverToBoxAdapter(child: _PromotionsStrip(ref: ref)),
+          const SliverToBoxAdapter(child: _PromotionsStrip()),
           const SliverToBoxAdapter(child: _HeroSection()),
-          SliverToBoxAdapter(child: _BestsellersSection(ref: ref)),
-          SliverToBoxAdapter(child: _NewArrivalsSection(ref: ref)),
+          const SliverToBoxAdapter(child: _BestsellersSection()),
+          const SliverToBoxAdapter(child: _NewArrivalsSection()),
           const SliverToBoxAdapter(child: _CategoriesSection()),
           const SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
@@ -46,12 +46,15 @@ class _AppBar extends ConsumerWidget {
       floating: true,
       backgroundColor: bg,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-          color: fg,
+      leading: Tooltip(
+        message: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+        child: IconButton(
+          icon: Icon(
+            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            color: fg,
+          ),
+          onPressed: () => ref.read(themeProvider.notifier).toggle(),
         ),
-        onPressed: () => ref.read(themeProvider.notifier).toggle(),
       ),
       title: Text(
         'OnlyMen',
@@ -241,12 +244,11 @@ class _HeroSectionState extends State<_HeroSection> {
 }
 
 // ── Promotions Strip ─────────────────────────────────────────
-class _PromotionsStrip extends StatelessWidget {
-  final WidgetRef ref;
-  const _PromotionsStrip({required this.ref});
+class _PromotionsStrip extends ConsumerWidget {
+  const _PromotionsStrip();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final promotions = ref.watch(promotionsProvider);
     return promotions.when(
       data: (promos) {
@@ -301,12 +303,11 @@ class _PromotionsStrip extends StatelessWidget {
 }
 
 // ── Bestsellers ───────────────────────────────────────────────
-class _BestsellersSection extends StatelessWidget {
-  final WidgetRef ref;
-  const _BestsellersSection({required this.ref});
+class _BestsellersSection extends ConsumerWidget {
+  const _BestsellersSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final products = ref.watch(bestsellersProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 32),
@@ -374,12 +375,11 @@ class _BestsellersSection extends StatelessWidget {
 }
 
 // ── New Arrivals ──────────────────────────────────────────────
-class _NewArrivalsSection extends StatelessWidget {
-  final WidgetRef ref;
-  const _NewArrivalsSection({required this.ref});
+class _NewArrivalsSection extends ConsumerWidget {
+  const _NewArrivalsSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final products = ref.watch(newArrivalsProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 32),

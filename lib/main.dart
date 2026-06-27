@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/supabase_config.dart';
+import 'state/shared_prefs_provider.dart';
 import 'app.dart';
 
 const _debugLaunchChannel = MethodChannel('com.yourname.onlymen/debug_launch');
