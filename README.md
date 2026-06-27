@@ -26,6 +26,13 @@ A modern minimalist e-commerce Flutter app for men's clothing. Black, white, nav
 - **Local storage:** shared_preferences (favorites + cart)
 - **Map:** flutter_map (static markers, OpenStreetMap tiles)
 
+## App Icon
+
+The app icon is built using `flutter_launcher_icons` with a custom text-based design:
+- Black background (`#0A0A0A`)
+- "ONLYMEN" in white, gold separator, and responsive text structure
+- Fully themed to match the app's color palette
+
 ## Setup
 
 ### Prerequisites
