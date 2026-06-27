@@ -67,7 +67,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   final _scrollController = ScrollController();
   bool _isTyping = false;
   final List<_ChatMessage> _messages = [
-    _ChatMessage(
+    const _ChatMessage(
       text:
           'Hi there! Looking over your recent purchases. Thinking we should lean into heavier layers for the upcoming season. Thoughts?',
       isAlex: true,
