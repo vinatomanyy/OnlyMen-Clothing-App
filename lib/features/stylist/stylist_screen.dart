@@ -232,7 +232,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen>
 
   SliverAppBar _buildSliverHeader() => SliverAppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        expandedHeight: 280,
+        expandedHeight: 300,
         pinned: true,
         automaticallyImplyLeading: false,
         flexibleSpace: FlexibleSpaceBar(

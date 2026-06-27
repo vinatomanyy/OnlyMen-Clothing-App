@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/product.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../widgets/app_image.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -16,11 +18,13 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
+  Timer? _debounce;
 
   List<Product> _allProducts = [];
   List<Product> _results = [];
-  List<String> _recentSearches = ['Wool Overcoat', 'White Oxford', 'Chelsea Boots'];
+  final List<String> _recentSearches = ['Wool Overcoat', 'White Oxford', 'Chelsea Boots'];
   bool _loading = true;
+  bool _hasError = false;
   bool _hasQuery = false;
 
   final List<_CategoryShortcut> _shortcuts = const [
@@ -45,36 +49,47 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   Future<void> _loadProducts() async {
-    final raw = await rootBundle.loadString('assets/mock/products.json');
-    final list = (jsonDecode(raw) as List)
-        .map((e) => Product.fromJson(e))
-        .toList();
-    setState(() {
-      _allProducts = list;
-      _loading = false;
-    });
+    try {
+      final raw = await rootBundle.loadString('assets/mock/products.json');
+      final list = (jsonDecode(raw) as List)
+          .map((e) => Product.fromJson(e))
+          .toList();
+      setState(() {
+        _allProducts = list;
+        _loading = false;
+      });
+    } catch (_) {
+      setState(() {
+        _loading = false;
+        _hasError = true;
+      });
+    }
   }
 
   void _onQueryChanged() {
-    final q = _controller.text.trim().toLowerCase();
-    setState(() {
-      _hasQuery = q.isNotEmpty;
-      if (q.isEmpty) {
-        _results = [];
-      } else {
-        _results = _allProducts.where((p) {
-          return p.name.toLowerCase().contains(q) ||
-              p.category.toLowerCase().contains(q) ||
-              p.brand.toLowerCase().contains(q) ||
-              p.description.toLowerCase().contains(q);
-        }).toList();
-      }
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final q = _controller.text.trim().toLowerCase();
+      setState(() {
+        _hasQuery = q.isNotEmpty;
+        if (q.isEmpty) {
+          _results = [];
+        } else {
+          _results = _allProducts.where((p) {
+            return p.name.toLowerCase().contains(q) ||
+                p.category.toLowerCase().contains(q) ||
+                p.brand.toLowerCase().contains(q) ||
+                p.description.toLowerCase().contains(q);
+          }).toList();
+        }
+      });
     });
   }
 
@@ -110,9 +125,15 @@ class _SearchScreenState extends State<SearchScreen> {
               child: _loading
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.accent))
-                  : _hasQuery
-                      ? _buildResults()
-                      : _buildDiscovery(),
+                  : _hasError
+                      ? Center(
+                          child: Text('Failed to load products',
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.grey500)),
+                        )
+                      : _hasQuery
+                          ? _buildResults()
+                          : _buildDiscovery(),
             ),
           ],
         ),
@@ -365,11 +386,9 @@ class _SearchResultCard extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  p.images.first,
+                AppImage(
+                  url: p.images.first,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      Container(color: AppColors.grey800),
                 ),
                 if (p.isNew)
                   Positioned(

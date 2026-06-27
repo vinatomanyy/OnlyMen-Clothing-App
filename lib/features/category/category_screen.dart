@@ -60,15 +60,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   Future<void> _loadProducts() async {
-    final raw = await rootBundle.loadString('assets/mock/products.json');
-    final list = (jsonDecode(raw) as List)
-        .map((e) => Product.fromJson(e))
-        .toList();
-    setState(() {
-      _all = list;
-      _loading = false;
-    });
-    _applyFilters();
+    try {
+      final raw = await rootBundle.loadString('assets/mock/products.json');
+      final list = (jsonDecode(raw) as List)
+          .map((e) => Product.fromJson(e))
+          .toList();
+      setState(() {
+        _all = list;
+        _loading = false;
+      });
+      _applyFilters();
+    } catch (_) {
+      setState(() => _loading = false);
+    }
   }
 
   void _applyFilters() {
@@ -546,7 +550,7 @@ class _ProductCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (p.isNew)
-                        _Badge(label: 'NEW', bg: AppColors.accent, fg: AppColors.black),
+                        const _Badge(label: 'NEW', bg: AppColors.accent, fg: AppColors.black),
                       if (p.hasDiscount) ...[
                         const SizedBox(height: 4),
                         _Badge(label: '-${p.discountPercent}%', bg: AppColors.error, fg: AppColors.white),

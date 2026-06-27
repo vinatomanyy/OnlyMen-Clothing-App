@@ -47,14 +47,14 @@ class ShimmerProductGrid extends StatelessWidget {
           childAspectRatio: 0.62,
         ),
         itemCount: count,
-        itemBuilder: (_, __) => Column(
+        itemBuilder: (_, __) => const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: ShimmerBox(height: double.infinity)),
-            const SizedBox(height: 8),
-            const ShimmerBox(height: 12, width: 120),
-            const SizedBox(height: 6),
-            const ShimmerBox(height: 12, width: 60),
+            SizedBox(height: 8),
+            ShimmerBox(height: 12, width: 120),
+            SizedBox(height: 6),
+            ShimmerBox(height: 12, width: 60),
           ],
         ),
       );
@@ -72,15 +72,15 @@ class ShimmerProductList extends StatelessWidget {
         itemBuilder: (_, __) => Container(
           margin: const EdgeInsets.only(bottom: 12),
           height: 130,
-          child: Row(
+          child: const Row(
             children: [
-              const ShimmerBox(width: 110, height: 130),
-              const SizedBox(width: 12),
+              ShimmerBox(width: 110, height: 130),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     ShimmerBox(height: 14, width: double.infinity),
                     SizedBox(height: 8),
                     ShimmerBox(height: 12, width: 100),
@@ -109,9 +109,9 @@ class ShimmerBranchList extends StatelessWidget {
         itemBuilder: (_, __) => Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               ShimmerBox(height: 14, width: 180),
               SizedBox(height: 8),
               ShimmerBox(height: 12, width: double.infinity),
@@ -130,16 +130,16 @@ class ShimmerProductDetail extends StatelessWidget {
   const ShimmerProductDetail({super.key});
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
+  Widget build(BuildContext context) => const SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ShimmerBox(height: 420),
+            ShimmerBox(height: 420),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   ShimmerBox(height: 24, width: 200),
                   SizedBox(height: 12),
                   ShimmerBox(height: 18, width: 100),
@@ -176,20 +176,20 @@ class ShimmerReviewList extends StatelessWidget {
         itemBuilder: (_, __) => Container(
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(16),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: const [
+                children: [
                   ShimmerBox(width: 36, height: 36),
                   SizedBox(width: 10),
                   Expanded(child: ShimmerBox(height: 12, width: 120)),
                 ],
               ),
-              const SizedBox(height: 12),
-              const ShimmerBox(height: 12, width: double.infinity),
-              const SizedBox(height: 6),
-              const ShimmerBox(height: 12, width: 200),
+              SizedBox(height: 12),
+              ShimmerBox(height: 12, width: double.infinity),
+              SizedBox(height: 6),
+              ShimmerBox(height: 12, width: 200),
             ],
           ),
         ),
