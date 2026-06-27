@@ -76,9 +76,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _step == 2 ? null : _buildAppBar(),
       body: _step == 0
-          ? _buildAddressStep()
+          ? _buildAddressStep(context)
           : _step == 1
-              ? _buildPaymentStep()
+              ? _buildPaymentStep(context)
               : _buildConfirmation(context),
     );
   }
@@ -102,7 +102,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: 3,
-                color: i <= _step ? AppColors.accent : AppColors.grey800,
+                color: i <= _step ? AppColors.accent : (_isDark(context) ? AppColors.grey800 : AppColors.grey300),
               ),
             )),
           ),
@@ -110,7 +110,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
 
   // ── Step 1: Address ───────────────────────────────────────────
-  Widget _buildAddressStep() => Form(
+  Widget _buildAddressStep(BuildContext context) => Form(
         key: _addressFormKey,
         child: Column(
           children: [
@@ -124,6 +124,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           .copyWith(color: AppColors.grey400, letterSpacing: 1.5)),
                   const SizedBox(height: 20),
                   _buildField(
+                    context,
                     controller: _nameController,
                     label: 'Full Name',
                     hint: 'John Doe',
@@ -131,6 +132,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildField(
+                    context,
                     controller: _phoneController,
                     label: 'Phone Number',
                     hint: '+855 12 345 678',
@@ -139,6 +141,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildField(
+                    context,
                     controller: _addressController,
                     label: 'Street Address',
                     hint: '123 Norodom Blvd',
@@ -146,6 +149,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildField(
+                    context,
                     controller: _cityController,
                     label: 'City',
                     hint: 'Phnom Penh',
@@ -155,8 +159,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.grey900,
-                      border: Border.all(color: AppColors.grey800),
+                      color: _surface(context),
+                      border: Border.all(color: _border(context)),
                     ),
                     child: Row(
                       children: [
@@ -172,13 +176,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ],
               ),
             ),
-            _buildBottomBar('CONTINUE TO PAYMENT', widget.total),
+            _buildBottomBar(context, 'CONTINUE TO PAYMENT', widget.total),
           ],
         ),
       );
 
   // ── Step 2: Payment ───────────────────────────────────────────
-  Widget _buildPaymentStep() => Form(
+  Widget _buildPaymentStep(BuildContext context) => Form(
         key: _paymentFormKey,
         child: Column(
           children: [
@@ -196,12 +200,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     height: 160,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.grey900, AppColors.cardDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      border: Border.all(color: AppColors.grey700),
+                      gradient: _isDark(context)
+                          ? const LinearGradient(
+                              colors: [AppColors.grey900, AppColors.cardDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : const LinearGradient(
+                              colors: [AppColors.grey200, AppColors.grey300],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                      border: Border.all(color: _border(context)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,8 +222,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             Text('ONLYMEN',
                                 style: AppTextStyles.labelSmall
                                     .copyWith(color: AppColors.accent, letterSpacing: 2)),
-                            const Icon(Icons.credit_card,
-                                color: AppColors.grey600, size: 28),
+                            Icon(Icons.credit_card,
+                                color: _isDark(context) ? AppColors.grey600 : AppColors.grey500, size: 28),
                           ],
                         ),
                         const Spacer(),
@@ -222,7 +232,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                               ? '•••• •••• •••• ••••'
                               : _formatCardDisplay(_cardController.text),
                           style: AppTextStyles.labelLarge
-                              .copyWith(color: AppColors.white, letterSpacing: 2),
+                              .copyWith(color: _isDark(context) ? AppColors.white : AppColors.black, letterSpacing: 2),
                         ),
                         const SizedBox(height: 12),
                         Row(
@@ -232,7 +242,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                   ? 'CARD HOLDER'
                                   : _cardNameController.text.toUpperCase(),
                               style: AppTextStyles.bodySmall
-                                  .copyWith(color: AppColors.grey400),
+                                  .copyWith(color: _isDark(context) ? AppColors.grey400 : AppColors.grey600),
                             ),
                             const Spacer(),
                             Text(
@@ -240,7 +250,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                   ? 'MM/YY'
                                   : _expiryController.text,
                               style: AppTextStyles.bodySmall
-                                  .copyWith(color: AppColors.grey400),
+                                  .copyWith(color: _isDark(context) ? AppColors.grey400 : AppColors.grey600),
                             ),
                           ],
                         ),
@@ -249,6 +259,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 24),
                   _buildField(
+                    context,
                     controller: _cardNameController,
                     label: 'Name on Card',
                     hint: 'John Doe',
@@ -257,6 +268,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildField(
+                    context,
                     controller: _cardController,
                     label: 'Card Number',
                     hint: '1234 5678 9012 3456',
@@ -277,6 +289,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     children: [
                       Expanded(
                         child: _buildField(
+                          context,
                           controller: _expiryController,
                           label: 'Expiry',
                           hint: 'MM/YY',
@@ -293,6 +306,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: _buildField(
+                          context,
                           controller: _cvvController,
                           label: 'CVV',
                           hint: '•••',
@@ -322,6 +336,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
             ),
             _buildBottomBar(
+              context,
               _placing ? 'PLACING ORDER...' : 'PLACE ORDER',
               widget.total,
               loading: _placing,
@@ -348,7 +363,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
               const SizedBox(height: 28),
               Text('ORDER PLACED',
-                  style: AppTextStyles.h2.copyWith(color: AppColors.white)),
+                  style: AppTextStyles.h2.copyWith(color: Theme.of(context).colorScheme.onSurface)),
               const SizedBox(height: 12),
               Text(
                 'Thank you! Your order has been received.',
@@ -361,8 +376,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.grey900,
-                  border: Border.all(color: AppColors.grey800),
+                  color: _surface(context),
+                  border: Border.all(color: _border(context)),
                 ),
                 child: Column(
                   children: [
@@ -378,7 +393,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             ? 'Phnom Penh'
                             : _cityController.text),
                     const SizedBox(height: 12),
-                    _ConfirmRow(label: 'Estimated', value: '3–5 business days'),
+                    const _ConfirmRow(label: 'Estimated', value: '3–5 business days'),
                   ],
                 ),
               ),
@@ -402,12 +417,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   width: double.infinity,
                   height: 52,
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.grey700),
+                    border: Border.all(color: _border(context)),
                   ),
                   alignment: Alignment.center,
                   child: Text('EXPLORE LOOKBOOK',
                       style: AppTextStyles.labelLarge
-                          .copyWith(color: AppColors.white)),
+                          .copyWith(color: Theme.of(context).colorScheme.onSurface)),
                 ),
               ),
             ],
@@ -415,7 +430,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
       );
 
-  Widget _buildBottomBar(String label, double total, {bool loading = false}) =>
+  Widget _buildBottomBar(BuildContext context, String label, double total,
+          {bool loading = false}) =>
       Container(
         padding: EdgeInsets.fromLTRB(
             20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
@@ -434,7 +450,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         AppTextStyles.bodySmall.copyWith(color: AppColors.grey400)),
                 Text('\$${total.toStringAsFixed(2)}',
                     style: AppTextStyles.labelLarge
-                        .copyWith(color: AppColors.white)),
+                        .copyWith(color: Theme.of(context).colorScheme.onSurface)),
               ],
             ),
             const SizedBox(height: 12),
@@ -460,7 +476,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
       );
 
-  Widget _buildField({
+  Widget _buildField(BuildContext context, {
     required TextEditingController controller,
     required String label,
     required String hint,
@@ -482,7 +498,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             keyboardType: keyboardType,
             inputFormatters: inputFormatters,
             obscureText: obscureText,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+            style: AppTextStyles.bodyMedium.copyWith(
+                color: Theme.of(context).colorScheme.onSurface),
             onChanged: onChanged,
             validator: validator,
             decoration: InputDecoration(
@@ -490,15 +507,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               hintStyle:
                   AppTextStyles.bodySmall.copyWith(color: AppColors.grey600),
               filled: true,
-              fillColor: AppColors.grey900,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: AppColors.grey700),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: AppColors.grey700),
-              ),
+              fillColor: _surface(context),
+              border: _outlineBorder(context),
+              enabledBorder: _outlineBorder(context),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: const BorderSide(color: AppColors.accent),
@@ -512,6 +523,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           ),
         ],
+      );
+
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  Color _surface(BuildContext context) =>
+      _isDark(context) ? AppColors.grey900 : AppColors.grey100;
+
+  Color _border(BuildContext context) =>
+      _isDark(context) ? AppColors.grey700 : AppColors.grey300;
+
+  OutlineInputBorder _outlineBorder(BuildContext context) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: BorderSide(color: _border(context)),
       );
 
   String _formatCardDisplay(String digits) {
@@ -572,7 +598,8 @@ class _ConfirmRow extends StatelessWidget {
               style:
                   AppTextStyles.bodySmall.copyWith(color: AppColors.grey500)),
           Text(value,
-              style: AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.onSurface)),
+              style: AppTextStyles.labelSmall.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface)),
         ],
       );
 }
