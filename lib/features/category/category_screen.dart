@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
 import '../../models/product.dart';
 import '../../state/favorites_provider.dart';
 import '../../theme/app_colors.dart';
@@ -61,10 +60,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Future<void> _loadProducts() async {
     try {
-      final raw = await rootBundle.loadString('assets/mock/products.json');
-      final list = (jsonDecode(raw) as List)
-          .map((e) => Product.fromJson(e))
-          .toList();
+      final list = await SupabaseRepository.getProducts();
       setState(() {
         _all = list;
         _loading = false;

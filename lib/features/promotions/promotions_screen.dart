@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
 import '../../models/promotion.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -25,14 +25,15 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
   }
 
   Future<void> _loadData() async {
-    final raw = await rootBundle.loadString('assets/mock/promotions.json');
-    final promos = (jsonDecode(raw) as List)
-        .map((e) => Promotion.fromJson(e))
-        .toList();
-    setState(() {
-      _promos = promos;
-      _loading = false;
-    });
+    try {
+      final promos = await SupabaseRepository.getPromotions();
+      setState(() {
+        _promos = promos;
+        _loading = false;
+      });
+    } catch (_) {
+      setState(() => _loading = false);
+    }
   }
 
   void _copyCode(String code) {

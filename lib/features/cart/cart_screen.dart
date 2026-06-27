@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
+import '../../models/product.dart';
 import '../../state/card_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -18,6 +20,24 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   String? _appliedPromo;
   String? _promoError;
   double _discount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshCartPrices());
+  }
+
+  Future<void> _refreshCartPrices() async {
+    final items = ref.read(cartProvider);
+    if (items.isEmpty) return;
+    final ids = items.map((e) => e.product.id).toSet().toList();
+    final fresh = await Future.wait(ids.map(SupabaseRepository.getProductById));
+    final map = <String, Product>{};
+    for (final p in fresh) {
+      if (p != null) map[p.id] = p;
+    }
+    ref.read(cartProvider.notifier).refreshPrices(map);
+  }
 
   // Mock valid promo codes
   final _promoCodes = {

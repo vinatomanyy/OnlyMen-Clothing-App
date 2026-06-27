@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
 import '../../models/product.dart';
 import '../../state/card_provider.dart';
 import '../../state/favorites_provider.dart';
@@ -65,16 +64,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Future<void> _loadProduct() async {
-    final raw = await rootBundle.loadString('assets/mock/products.json');
-    final list = (jsonDecode(raw) as List).map((e) => Product.fromJson(e)).toList();
-    final product = list.firstWhere(
-      (p) => p.id == widget.productId,
-      orElse: () => list.first,
-    );
-    setState(() {
-      _product = product;
-      _loading = false;
-    });
+    final product = await SupabaseRepository.getProductById(widget.productId);
+    if (mounted) {
+      setState(() {
+        _product = product;
+        _loading = false;
+      });
+    }
   }
 
   void _addToCart() {

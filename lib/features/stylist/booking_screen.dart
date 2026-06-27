@@ -184,7 +184,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     }
   }
 
-  void _confirmBooking() {
+  Future<void> _confirmBooking() async {
     final name = _nameCtrl.text.trim();
     final phone = _phoneCtrl.text.trim();
     if (_selectedBranchIdx == null) {
@@ -221,20 +221,24 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return;
     }
     final branch = _branches[_selectedBranchIdx!];
-    ref.read(bookingProvider.notifier)
+    final notifier = ref.read(bookingProvider.notifier);
+    notifier
       ..setService('Try-On Experience — ${branch.name}')
       ..setDate(_selectedDate!)
       ..setTimeSlot(_selectedSlot!)
       ..setContactInfo(name, '')
       ..setPhone(phone);
 
-    ref.read(bookingProvider.notifier).addToLog(BookingLogEntry(
+    await notifier.submit();
+
+    notifier.addToLog(BookingLogEntry(
       branchName: branch.name,
       date: '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
       time: _selectedSlot!,
       status: 'Confirmed',
     ));
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Booking confirmed!',

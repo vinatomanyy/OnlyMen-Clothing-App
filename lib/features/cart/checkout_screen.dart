@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
+import '../../models/order.dart';
 import '../../state/card_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -61,7 +63,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   Future<void> _placeOrder() async {
     setState(() => _placing = true);
-    await Future.delayed(const Duration(milliseconds: 1500));
+    final cartItems = ref.read(cartProvider);
+    final order = Order(
+      customerName: _nameController.text.trim(),
+      customerPhone: _phoneController.text.trim(),
+      items: cartItems,
+      total: widget.total,
+    );
+    await SupabaseRepository.createOrder(order);
     _orderNumber = 'OM${Random().nextInt(900000) + 100000}';
     ref.read(cartProvider.notifier).clear();
     setState(() {
@@ -410,21 +419,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           .copyWith(color: AppColors.black)),
                 ),
               ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () => context.push('/lookbook'),
-                child: Container(
-                  width: double.infinity,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: _border(context)),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text('EXPLORE LOOKBOOK',
-                      style: AppTextStyles.labelLarge
-                          .copyWith(color: Theme.of(context).colorScheme.onSurface)),
-                ),
-              ),
+
             ],
           ),
         ),

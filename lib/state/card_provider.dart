@@ -67,6 +67,14 @@ class CartNotifier extends Notifier<List<CartItem>> {
 
   void clear() => state = [];
 
+  void refreshPrices(Map<String, Product> fresh) {
+    state = state.map((item) {
+      final p = fresh[item.product.id];
+      if (p == null || identical(p, item.product)) return item;
+      return CartItem(product: p, size: item.size, colorName: item.colorName, quantity: item.quantity);
+    }).toList();
+  }
+
   int get itemCount => state.fold(0, (sum, item) => sum + item.quantity);
 }
 

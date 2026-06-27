@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
 import '../../models/review.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -49,12 +48,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   }
 
   Future<void> _loadReviews() async {
-    final raw = await rootBundle.loadString('assets/mock/reviews.json');
-    final all = (jsonDecode(raw) as List).map((e) => Review.fromJson(e)).toList();
-    setState(() {
-      _reviews = all.where((r) => r.productId == widget.productId).toList();
-      _loading = false;
-    });
+    try {
+      _reviews = await SupabaseRepository.getReviews(productId: widget.productId);
+      setState(() => _loading = false);
+    } catch (_) {
+      setState(() => _loading = false);
+    }
   }
 
   double get _avgRating => _reviews.isEmpty
@@ -70,9 +69,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   Future<void> _submitReview() async {
     if (_nameController.text.trim().isEmpty || _commentController.text.trim().isEmpty) return;
     setState(() => _submitting = true);
-    await Future.delayed(const Duration(milliseconds: 800));
     final newReview = Review(
-      id: 'r_local_${DateTime.now().millisecondsSinceEpoch}',
+      id: 'r_${DateTime.now().millisecondsSinceEpoch}',
       productId: widget.productId,
       userName: _nameController.text.trim(),
       rating: _formRating,
@@ -80,10 +78,11 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       fitFeedback: _formFit,
       createdAt: DateTime.now(),
     );
+    final success = await SupabaseRepository.createReview(newReview);
     setState(() {
-      _reviews.insert(0, newReview);
+      if (success) _reviews.insert(0, newReview);
       _submitting = false;
-      _submitted = true;
+      _submitted = success;
       _showForm = false;
       _nameController.clear();
       _commentController.clear();

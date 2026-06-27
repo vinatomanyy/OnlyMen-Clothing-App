@@ -5,6 +5,7 @@ import '../models/review.dart';
 import '../models/promotion.dart';
 import '../models/lookbook.dart';
 import '../models/booking.dart';
+import '../models/order.dart';
 import 'mock_repository.dart';
 
 class SupabaseRepository {
@@ -16,7 +17,7 @@ class SupabaseRepository {
       final res = await _client
           .from('products')
           .select()
-          .order('created_at', ascending: false);
+          .order('id', ascending: true);
       final list = (res as List).map((e) => Product.fromJson(e)).toList();
       if (list.isEmpty) return MockRepository.getProducts();
       return list;
@@ -31,7 +32,7 @@ class SupabaseRepository {
           .from('products')
           .select()
           .eq('category', category)
-          .order('created_at', ascending: false);
+          .order('id', ascending: true);
       final list = (res as List).map((e) => Product.fromJson(e)).toList();
       if (list.isEmpty) {
         final all = await MockRepository.getProducts();
@@ -49,7 +50,8 @@ class SupabaseRepository {
       final res = await _client
           .from('products')
           .select()
-          .eq('is_bestseller', true);
+          .eq('is_bestseller', true)
+          .order('id', ascending: true);
       final list = (res as List).map((e) => Product.fromJson(e)).toList();
       if (list.isEmpty) {
         final all = await MockRepository.getProducts();
@@ -67,7 +69,8 @@ class SupabaseRepository {
       final res = await _client
           .from('products')
           .select()
-          .eq('is_new', true);
+          .eq('is_new', true)
+          .order('id', ascending: true);
       final list = (res as List).map((e) => Product.fromJson(e)).toList();
       if (list.isEmpty) {
         final all = await MockRepository.getProducts();
@@ -103,7 +106,8 @@ class SupabaseRepository {
       final res = await _client
           .from('products')
           .select()
-          .ilike('name', '%$query%');
+          .ilike('name', '%$query%')
+          .order('id', ascending: true);
       return (res as List).map((e) => Product.fromJson(e)).toList();
     } catch (_) {
       final all = await MockRepository.getProducts();
@@ -166,6 +170,26 @@ class SupabaseRepository {
   static Future<bool> createBooking(Booking booking) async {
     try {
       await _client.from('bookings').insert(booking.toJson());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ── Orders ────────────────────────────────────────────────
+  static Future<bool> createOrder(Order order) async {
+    try {
+      await _client.from('orders').insert(order.toJson());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ── Create Review ─────────────────────────────────────────
+  static Future<bool> createReview(Review review) async {
+    try {
+      await _client.from('reviews').insert(review.toJson());
       return true;
     } catch (_) {
       return false;
