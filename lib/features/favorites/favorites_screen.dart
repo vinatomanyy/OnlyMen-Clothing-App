@@ -30,14 +30,18 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   }
 
   Future<void> _loadProducts() async {
-    final raw = await rootBundle.loadString('assets/mock/products.json');
-    final list = (jsonDecode(raw) as List)
-        .map((e) => Product.fromJson(e))
-        .toList();
-    setState(() {
-      _allProducts = list;
-      _loadingProducts = false;
-    });
+    try {
+      final raw = await rootBundle.loadString('assets/mock/products.json');
+      final list = (jsonDecode(raw) as List)
+          .map((e) => Product.fromJson(e))
+          .toList();
+      setState(() {
+        _allProducts = list;
+        _loadingProducts = false;
+      });
+    } catch (_) {
+      setState(() => _loadingProducts = false);
+    }
   }
 
   List<Product> _favoriteProducts(List<String> ids) =>
@@ -205,7 +209,7 @@ class _FavoriteCard extends StatelessWidget {
                   ),
                 ),
                 if (p.isNew)
-                  Positioned(
+                  const Positioned(
                     top: 8, left: 8,
                     child: _Badge(label: 'NEW', bg: AppColors.accent, fg: AppColors.black),
                   ),

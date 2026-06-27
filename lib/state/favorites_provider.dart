@@ -1,28 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'shared_prefs_provider.dart';
 
 class FavoritesNotifier extends Notifier<List<String>> {
   static const _key = 'favorites';
 
   @override
   List<String> build() {
-    _load();
-    return [];
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getStringList(_key) ?? [];
-    state = saved;
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getStringList(_key) ?? [];
   }
 
   Future<void> toggle(String productId) async {
-    final prefs = await SharedPreferences.getInstance();
     if (state.contains(productId)) {
       state = state.where((id) => id != productId).toList();
     } else {
       state = [...state, productId];
     }
+    final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setStringList(_key, state);
   }
 
