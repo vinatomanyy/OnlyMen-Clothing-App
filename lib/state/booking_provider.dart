@@ -105,6 +105,7 @@ class BookingNotifier extends Notifier<BookingState> {
       timeSlot: state.timeSlot!,
       name: state.name!,
       email: state.email!,
+      phone: state.phone ?? '',
     );
 
     final success = await SupabaseRepository.createBooking(booking);

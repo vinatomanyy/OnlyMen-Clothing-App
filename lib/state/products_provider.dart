@@ -1,36 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product.dart';
-import '../data/mock_repository.dart';
+import '../data/supabase_repository.dart';
 
-final productsProvider = FutureProvider<List<Product>>((ref) async {
-  return MockRepository.getProducts();
+final productsProvider = FutureProvider.autoDispose<List<Product>>((ref) async {
+  return SupabaseRepository.getProducts();
 });
 
-final bestsellersProvider = FutureProvider<List<Product>>((ref) async {
-  final all = await MockRepository.getProducts();
-  return all.where((p) => p.isBestseller).toList();
+final bestsellersProvider = FutureProvider.autoDispose<List<Product>>((ref) async {
+  return SupabaseRepository.getBestsellers();
 });
 
-final newArrivalsProvider = FutureProvider<List<Product>>((ref) async {
-  final all = await MockRepository.getProducts();
-  return all.where((p) => p.isNew).toList();
+final newArrivalsProvider = FutureProvider.autoDispose<List<Product>>((ref) async {
+  return SupabaseRepository.getNewArrivals();
 });
 
 final productsByCategoryProvider =
-    FutureProvider.family<List<Product>, String>((ref, category) async {
-  final all = await MockRepository.getProducts();
-  if (category == 'all') return all;
-  return all.where((p) => p.category == category).toList();
+    FutureProvider.autoDispose.family<List<Product>, String>((ref, category) async {
+  if (category == 'all') return SupabaseRepository.getProducts();
+  return SupabaseRepository.getProductsByCategory(category);
 });
 
 final productByIdProvider =
-    FutureProvider.family<Product?, String>((ref, id) async {
-  final all = await MockRepository.getProducts();
-  try {
-    return all.firstWhere((p) => p.id == id);
-  } catch (_) {
-    return null;
-  }
+    FutureProvider.autoDispose.family<Product?, String>((ref, id) async {
+  return SupabaseRepository.getProductById(id);
 });
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -38,13 +30,7 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 final searchResultsProvider = FutureProvider<List<Product>>((ref) async {
   final query = ref.watch(searchQueryProvider);
   if (query.isEmpty) return [];
-  final all = await MockRepository.getProducts();
-  return all
-      .where((p) =>
-          p.name.toLowerCase().contains(query.toLowerCase()) ||
-          p.brand.toLowerCase().contains(query.toLowerCase()) ||
-          p.category.toLowerCase().contains(query.toLowerCase()))
-      .toList();
+  return SupabaseRepository.searchProducts(query);
 });
 
 final selectedCategoryProvider = StateProvider<String>((ref) => 'all');

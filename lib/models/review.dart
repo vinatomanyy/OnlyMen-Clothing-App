@@ -32,6 +32,17 @@ class Review {
         createdAt: DateTime.parse(json['created_at']),
       );
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'product_id': productId,
+        'user_name': userName,
+        'avatar_url': avatarUrl,
+        'rating': rating,
+        'comment': comment,
+        'fit_feedback': _formatFit(fitFeedback),
+        'created_at': createdAt.toIso8601String(),
+      };
+
   static FitFeedback _parseFit(String? val) {
     switch (val) {
       case 'runs_small':
@@ -40,6 +51,17 @@ class Review {
         return FitFeedback.runsLarge;
       default:
         return FitFeedback.trueToSize;
+    }
+  }
+
+  static String _formatFit(FitFeedback fit) {
+    switch (fit) {
+      case FitFeedback.runsSmall:
+        return 'runs_small';
+      case FitFeedback.runsLarge:
+        return 'runs_large';
+      case FitFeedback.trueToSize:
+        return 'true_to_size';
     }
   }
 }

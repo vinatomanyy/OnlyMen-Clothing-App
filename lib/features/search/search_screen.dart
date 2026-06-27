@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/supabase_repository.dart';
 import '../../models/product.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -57,10 +56,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _loadProducts() async {
     try {
-      final raw = await rootBundle.loadString('assets/mock/products.json');
-      final list = (jsonDecode(raw) as List)
-          .map((e) => Product.fromJson(e))
-          .toList();
+      final list = await SupabaseRepository.getProducts();
       setState(() {
         _allProducts = list;
         _loading = false;
@@ -416,8 +412,8 @@ class _SearchResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(p.name,
-              style:
-                  AppTextStyles.bodySmall.copyWith(color: AppColors.white),
+              style: AppTextStyles.bodySmall.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface),
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
