@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
+import 'state/shared_prefs_provider.dart';
 import 'utils/supabase_config.dart';
 import 'app.dart';
 
@@ -17,8 +18,9 @@ Future<void> main() async {
     publishableKey: supabaseAnonKey,
   );
 
+  final prefs = await SharedPreferences.getInstance();
+
   if (kDebugMode && defaultTargetPlatform == TargetPlatform.android) {
-    final prefs = await SharedPreferences.getInstance();
     final forceOnboarding =
         await _debugLaunchChannel.invokeMethod<bool>('shouldForceOnboarding') ??
             false;
@@ -27,5 +29,10 @@ Future<void> main() async {
     }
   }
 
-  runApp(const ProviderScope(child: OnlyMenApp()));
+  runApp(ProviderScope(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+    ],
+    child: const OnlyMenApp(),
+  ));
 }
