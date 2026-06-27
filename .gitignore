@@ -45,7 +45,6 @@ app.*.map.json
 /android/app/release
 
 # Environment / Secrets
-lib/utils/supabase_config.dart
 .env
 *.env
 .env.local
