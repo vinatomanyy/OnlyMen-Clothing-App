@@ -3,22 +3,23 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../widgets/app_image.dart';
 
 const _slides = [
   _Slide(
-    image: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=800',
+    image: 'assets/images/home1.jpg',
     tag: 'WELCOME TO ONLYMEN',
     title: 'Dress With\nIntent',
     subtitle: 'Premium men\'s fashion curated for those who understand that style is a statement, not an accident.',
   ),
   _Slide(
-    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
+    image: 'assets/images/home2.jpg',
     tag: 'DISCOVER',
     title: 'Find Your\nSignature Look',
     subtitle: 'Browse curated collections, editorial lookbooks, and new arrivals — all crafted for the modern man.',
   ),
   _Slide(
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800',
+    image: 'assets/images/home3.jpg',
     tag: 'EXPERIENCE',
     title: 'Style,\nDelivered',
     subtitle: 'Book a personal stylist, try on in store, or shop from anywhere. Your wardrobe, elevated.',
@@ -175,11 +176,7 @@ class _SlidePage extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         // Background image
-        Image.network(
-          slide.image,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(color: AppColors.grey900),
-        ),
+        AppImage(url: slide.image, fit: BoxFit.cover),
 
         // Gradient overlay
         DecoratedBox(

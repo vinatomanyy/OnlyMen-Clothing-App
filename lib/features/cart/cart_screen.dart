@@ -21,9 +21,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
   // Mock valid promo codes
   final _promoCodes = {
-    'ONLYMEN10': 0.10,
+    'SEASON30': 0.30,
+    'WELCOME15': 0.15,
+    'WEEKEND20': 0.20,
+    'LOYAL10': 0.10,
+    'BUNDLE25': 0.25,
     'WINTER20': 0.20,
-    'FIRST15': 0.15,
   };
 
   @override
@@ -74,7 +77,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     children: [
                       ...items.map((item) => _CartItemCard(
                             item: item,

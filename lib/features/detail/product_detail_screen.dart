@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/product.dart';
-import '../../models/review.dart';
 import '../../state/card_provider.dart';
 import '../../state/favorites_provider.dart';
+import '../../state/products_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/responsive.dart';
@@ -23,13 +23,11 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Product? _product;
-  List<Product> _related = [];
   bool _loading = true;
 
   int _currentImage = 0;
   String? _selectedSize;
   int _selectedColorIndex = 0;
-  List<Review> _reviews = [];
   bool _descExpanded = false;
   PageController _pageController = PageController();
 
@@ -73,19 +71,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       (p) => p.id == widget.productId,
       orElse: () => list.first,
     );
-    final related = list
-        .where((p) => p.category == product.category && p.id != product.id)
-        .take(4)
-        .toList();
-    final reviewRaw = await rootBundle.loadString('assets/mock/reviews.json');
-    final reviews = (jsonDecode(reviewRaw) as List)
-        .map((e) => Review.fromJson(e))
-        .where((r) => r.productId == product.id)
-        .toList();
     setState(() {
       _product = product;
-      _related = related;
-      _reviews = reviews;
       _loading = false;
     });
   }
@@ -149,23 +136,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildHeader(p),
-                      const SizedBox(height: 20),
-                      _buildColorSelector(p),
-                      const SizedBox(height: 20),
-                      _buildSizeSelector(p),
-                      const SizedBox(height: 20),
-                      _buildFitFeedback(),
-                      const SizedBox(height: 24),
-                      _buildDescription(p),
-                      const SizedBox(height: 24),
-                      _buildReviewSummary(p),
-                      if (_related.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        _buildColorSelector(p),
+                        const SizedBox(height: 20),
+                        _buildSizeSelector(p),
+                        const SizedBox(height: 20),
+                        _buildDescription(p),
+                        const SizedBox(height: 24),
+                        _buildReviewSummary(p),
                         const SizedBox(height: 32),
-                        _buildCompleteTheLook(),
+                        _buildYouMayAlsoLike(p),
                       ],
-                    ],
+                    ),
                   ),
-                ),
               ),
             ],
           ),
@@ -188,23 +171,73 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildTabletLayout(Product p) => Row(
+  Widget _buildTabletLayout(Product p) {
+    final images = _currentColorImages;
+    return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Left: image locked to full height
+          // Left: gallery with thumbnails
           Expanded(
             flex: 5,
-            child: Stack(
-              fit: StackFit.expand,
+            child: Column(
               children: [
-                Hero(
-                  tag: 'product-image-${p.id}',
-                  child: AppImage(url: p.images.first, fit: BoxFit.cover),
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      PageView.builder(
+                        controller: _pageController,
+                        itemCount: images.length,
+                        onPageChanged: (i) => setState(() => _currentImage = i),
+                        itemBuilder: (_, i) => i == 0
+                            ? Hero(
+                                tag: 'product-image-${p.id}',
+                                child: SizedBox.expand(
+                                  child: AppImage(url: images[i], fit: BoxFit.cover),
+                                ),
+                              )
+                            : SizedBox.expand(
+                                child: AppImage(url: images[i], fit: BoxFit.cover),
+                              ),
+                      ),
+                      Positioned(
+                        top: 0, left: 0, right: 0,
+                        child: _buildOverlayBar(p),
+                      ),
+                    ],
+                  ),
                 ),
-                Positioned(
-                  top: 0, left: 0, right: 0,
-                  child: _buildOverlayBar(p),
-                ),
+                if (images.length > 1)
+                  Container(
+                    height: 60,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: images.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemBuilder: (_, i) => GestureDetector(
+                        onTap: () => _pageController.animateToPage(
+                          i,
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                        ),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: _currentImage == i
+                                  ? AppColors.accent
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: AppImage(url: images[i], fit: BoxFit.cover),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -227,11 +260,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           const SizedBox(height: 20),
                           _buildSizeSelector(p),
                           const SizedBox(height: 20),
-                          _buildFitFeedback(),
                           const SizedBox(height: 24),
                           _buildDescription(p),
                           const SizedBox(height: 24),
                           _buildReviewSummary(p),
+                          const SizedBox(height: 32),
+                          _buildYouMayAlsoLike(p),
                         ],
                       ),
                     ),
@@ -243,6 +277,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
         ],
       );
+  }
 
   Widget _buildOverlayBar(Product p) => SafeArea(
         child: Padding(
@@ -278,13 +313,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (images.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
 
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.58,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Swipeable image slider
-            PageView.builder(
+      child: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.52,
+            child: PageView.builder(
               controller: _pageController,
               itemCount: images.length,
               onPageChanged: (i) => setState(() => _currentImage = i),
@@ -299,31 +332,40 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       child: AppImage(url: images[i], fit: BoxFit.cover),
                     ),
             ),
-
-            // Dot indicators
-            if (images.length > 1)
-              Positioned(
-                bottom: 16,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    images.length,
-                    (i) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: _currentImage == i ? 20 : 6,
-                      height: 2,
-                      color: _currentImage == i
-                          ? AppColors.white
-                          : Colors.white54,
+          ),
+          // Thumbnail strip
+          if (images.length > 1)
+            Container(
+              height: 60,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: images.length,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemBuilder: (_, i) => GestureDetector(
+                  onTap: () => _pageController.animateToPage(
+                    i,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                  ),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: _currentImage == i
+                            ? AppColors.accent
+                            : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
+                    child: AppImage(url: images[i], fit: BoxFit.cover),
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -445,22 +487,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget _buildSizeSelector(Product p) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text('SIZE',
-                  style: AppTextStyles.labelSmall
-                      .copyWith(color: AppColors.grey400)),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {},
-                child: Text('SIZE GUIDE',
-                    style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.accent,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.accent)),
-              ),
-            ],
-          ),
+          Text('SIZE',
+              style: AppTextStyles.labelSmall
+                  .copyWith(color: AppColors.grey400)),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
@@ -493,42 +522,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
         ],
       );
-
-  Widget _buildFitFeedback() {
-    if (_reviews.isEmpty) return const SizedBox.shrink();
-
-    final small = _reviews.where((r) => r.fitFeedback == FitFeedback.runsSmall).length;
-    final trueSize = _reviews.where((r) => r.fitFeedback == FitFeedback.trueToSize).length;
-    final large = _reviews.where((r) => r.fitFeedback == FitFeedback.runsLarge).length;
-    final dominant = trueSize >= small && trueSize >= large
-        ? 'True to Size'
-        : small > large
-            ? 'Runs Small'
-            : 'Runs Large';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('FIT',
-            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey400)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.accent),
-            color: AppColors.accent.withValues(alpha: 0.08),
-          ),
-          child: Text(
-            dominant,
-            style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text('Based on ${_reviews.length} reviews',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey700, fontSize: 10)),
-      ],
-    );
-  }
 
   Widget _buildDescription(Product p) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,58 +602,72 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
             ],
           ),
-        ],
-      );
+          ],
+        );
 
-  Widget _buildCompleteTheLook() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('COMPLETE THE LOOK',
-              style:
-                  AppTextStyles.labelSmall.copyWith(color: AppColors.grey400)),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _related.length,
-              itemBuilder: (_, i) {
-                final r = _related[i];
-                return GestureDetector(
-                  onTap: () => context.push('/product/${r.id}'),
-                  child: Container(
-                    width: 130,
-                    margin: const EdgeInsets.only(right: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: AppImage(
-                            url: r.images.first,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(r.name,
-                            style: AppTextStyles.bodySmall
-                                .copyWith(color: Theme.of(context).colorScheme.onSurface),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                        Text('\$${r.price.toStringAsFixed(0)}',
-                            style: AppTextStyles.labelSmall
-                                .copyWith(color: AppColors.accent)),
-                      ],
-                    ),
+  Widget _buildYouMayAlsoLike(Product p) {
+    final allProducts = ref.watch(productsProvider).valueOrNull ?? [];
+    if (allProducts.isEmpty) return const SizedBox.shrink();
+
+    final suggestions = allProducts
+        .where((x) => x.id != p.id)
+        .take(6)
+        .toList();
+    if (suggestions.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('YOU MAY ALSO LIKE',
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey400)),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: suggestions.length,
+            padding: const EdgeInsets.only(left: 0),
+            itemBuilder: (_, i) {
+              final prod = suggestions[i];
+              return GestureDetector(
+                onTap: () => context.push('/product/${prod.id}'),
+                child: Container(
+                  width: 140,
+                  margin: const EdgeInsets.only(right: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 154,
+                        child: AppImage(url: prod.images.first, fit: BoxFit.cover),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(prod.brand.toUpperCase(),
+                          style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.grey500, fontSize: 8)),
+                      const SizedBox(height: 2),
+                      Text(prod.name,
+                          style: AppTextStyles.bodySmall.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                      Text('\$${prod.price.toStringAsFixed(0)}',
+                          style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.accent)),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 
-  Widget _buildBottomCTA(Product p) => Container(
+  Widget _buildBottomCTA(Product p) {
+    final c = ref.watch(cartItemCountProvider);
+    return Container(
         padding: EdgeInsets.fromLTRB(
             20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
         decoration: BoxDecoration(
@@ -680,8 +687,36 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   border: Border.all(
                       color: Theme.of(context).colorScheme.onSurface),
                 ),
-                child: Icon(Icons.shopping_bag_outlined,
-                    color: Theme.of(context).colorScheme.onSurface, size: 20),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(Icons.shopping_bag_outlined,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 20),
+                    if (c > 0)
+                      Positioned(
+                        top: -10,
+                        right: -10,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: const BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            c > 9 ? '9+' : '$c',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.black,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -706,6 +741,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ],
         ),
       );
+  }
 }
 
 // Reusable widgets
@@ -731,4 +767,3 @@ class _CircleButton extends StatelessWidget {
         ),
       );
 }
-

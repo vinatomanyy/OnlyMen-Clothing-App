@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,106 @@ import '../../models/branch.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../widgets/shimmer_widgets.dart';
+import '../../widgets/branch_map_view.dart';
+
+void _showTryOnSheet(BuildContext context, Branch branch) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.cardDark,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+    ),
+    builder: (ctx) => Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('TRY ON IN STORE',
+              style: AppTextStyles.labelLarge
+                  .copyWith(color: AppColors.white)),
+          const SizedBox(height: 8),
+          Text(
+            branch.name,
+            style: AppTextStyles.bodyMedium
+                .copyWith(color: AppColors.grey400),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            branch.address,
+            style: AppTextStyles.bodySmall
+                .copyWith(color: AppColors.grey500),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Reserve a fitting room and our stylists will have your selected items ready when you arrive.',
+            style: AppTextStyles.bodyMedium
+                .copyWith(color: AppColors.grey300, height: 1.6),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    final uri = Uri.parse(
+                      'https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}',
+                    );
+                    launchUrl(uri, mode: LaunchMode.externalApplication);
+                  },
+                  child: Container(
+                    height: 48,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.grey700),
+                    ),
+                    child: Text(
+                      'DIRECTIONS',
+                      style: AppTextStyles.labelSmall
+                          .copyWith(color: AppColors.white),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.go('/booking'),
+                  child: Container(
+                    height: 48,
+                    color: AppColors.accent,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'BOOK',
+                      style: AppTextStyles.labelLarge
+                          .copyWith(color: AppColors.black),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () => Navigator.of(ctx).pop(),
+            child: Container(
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.grey700),
+              ),
+              child: Text(
+                'CANCEL',
+                style: AppTextStyles.labelSmall
+                    .copyWith(color: AppColors.grey500),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -54,7 +153,14 @@ class _MapScreenState extends State<MapScreen> {
                   duration: const Duration(milliseconds: 350),
                   curve: Curves.easeInOut,
                   height: _mapExpanded ? 280 : 140,
-                  child: _buildMockMap(),
+                  child: BranchMapView(
+                    branches: _branches,
+                    selectedIndex: _selectedIndex,
+                    onBranchTap: (i) {
+                      setState(() => _selectedIndex = i);
+                      _showTryOnSheet(context, _branches[i]);
+                    },
+                  ),
                 ),
                 // Toggle map size
                 GestureDetector(
@@ -80,6 +186,7 @@ class _MapScreenState extends State<MapScreen> {
                     itemCount: _branches.length,
                     itemBuilder: (_, i) => _BranchCard(
                       branch: _branches[i],
+                      index: i + 1,
                       selected: i == _selectedIndex,
                       onTap: () => setState(() => _selectedIndex = i),
                     ),
@@ -112,129 +219,18 @@ class _MapScreenState extends State<MapScreen> {
         ],
       );
 
-  Widget _buildMockMap() {
-    // Mock map using CustomPainter — no google_maps dependency needed
-    return Stack(
-      children: [
-        CustomPaint(
-          size: Size.infinite,
-          painter: _MockMapPainter(
-            branches: _branches,
-            selectedIndex: _selectedIndex,
-          ),
-        ),
-        // Map attribution
-        Positioned(
-          bottom: 6,
-          right: 8,
-          child: Text(
-            'Map view (mock)',
-            style: AppTextStyles.bodySmall
-                .copyWith(color: AppColors.grey700, fontSize: 9),
-          ),
-        ),
-        // Map pins overlay
-        ..._branches.asMap().entries.map((entry) {
-          final i = entry.key;
-          final b = entry.value;
-          // Normalize lat/lng to screen position (rough)
-          final minLat = 11.565, maxLat = 11.590;
-          final minLng = 104.880, maxLng = 104.930;
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final w = constraints.maxWidth;
-              final h = constraints.maxHeight;
-              final x = ((b.lng - minLng) / (maxLng - minLng)) * w;
-              final y =
-                  (1 - (b.lat - minLat) / (maxLat - minLat)) * h;
-              return Positioned(
-                left: x.clamp(20.0, w - 20.0) - 16,
-                top: y.clamp(20.0, h - 40.0) - 32,
-                child: GestureDetector(
-                  onTap: () => setState(() => _selectedIndex = i),
-                  child: _MapPin(
-                    label: '${i + 1}',
-                    selected: i == _selectedIndex,
-                    distKm: b.distanceKm,
-                  ),
-                ),
-              );
-            },
-          );
-        }),
-      ],
-    );
   }
-}
-
-// ── Map pin ───────────────────────────────────────────────────────
-class _MapPin extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final double distKm;
-
-  const _MapPin({
-    required this.label,
-    required this.selected,
-    required this.distKm,
-  });
-
-  @override
-  Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (selected)
-            Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 8, vertical: 3),
-              color: AppColors.black.withValues(alpha: 0.8),
-              child: Text(
-                '${distKm}km',
-                style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.accent, fontSize: 10),
-              ),
-            ),
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: selected ? AppColors.accent : AppColors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.black,
-                fontSize: 11,
-              ),
-            ),
-          ),
-          // Pin tail
-          Container(
-            width: 2,
-            height: 8,
-            color: selected ? AppColors.accent : AppColors.white,
-          ),
-        ],
-      );
-}
 
 // ── Branch card ───────────────────────────────────────────────────
 class _BranchCard extends StatelessWidget {
   final Branch branch;
+  final int index;
   final bool selected;
   final VoidCallback onTap;
 
   const _BranchCard({
     required this.branch,
+    required this.index,
     required this.selected,
     required this.onTap,
   });
@@ -269,7 +265,7 @@ class _BranchCard extends StatelessWidget {
                   color: selected ? AppColors.accent : AppColors.grey800,
                   alignment: Alignment.center,
                   child: Text(
-                    '${_branchIndex(branch)}',
+                    '$index',
                     style: AppTextStyles.labelSmall.copyWith(
                       color: selected
                           ? AppColors.black
@@ -297,33 +293,21 @@ class _BranchCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Distance
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${branch.distanceKm} km',
-                      style: AppTextStyles.labelSmall
-                          .copyWith(color: AppColors.accent),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6, vertical: 2),
+                  color: isOpen
+                      ? AppColors.success.withValues(alpha: 0.15)
+                      : AppColors.error.withValues(alpha: 0.15),
+                  child: Text(
+                    isOpen ? 'OPEN' : 'CLOSED',
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: isOpen
-                          ? AppColors.success.withValues(alpha: 0.15)
-                          : AppColors.error.withValues(alpha: 0.15),
-                      child: Text(
-                        isOpen ? 'OPEN' : 'CLOSED',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: isOpen
-                              ? AppColors.success
-                              : AppColors.error,
-                          fontSize: 9,
-                        ),
-                      ),
+                          ? AppColors.success
+                          : AppColors.error,
+                      fontSize: 9,
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -364,10 +348,10 @@ class _BranchCard extends StatelessWidget {
                   child: _ActionBtn(
                     label: 'DIRECTIONS',
                     icon: Icons.directions_outlined,
-                    onTap: () async {
+                      onTap: () {
                       final uri = Uri.parse(
                           'https://www.google.com/maps/dir/?api=1&destination=${branch.lat},${branch.lng}');
-                      if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                      launchUrl(uri, mode: LaunchMode.externalApplication);
                     },
                   ),
                 ),
@@ -388,80 +372,10 @@ class _BranchCard extends StatelessWidget {
     );
   }
 
-  int _branchIndex(Branch b) {
-    // Return 1-based index based on distanceKm order
-    return (b.distanceKm * 10).round() % 10 == 8 ? 1 :
-           (b.distanceKm * 10).round() % 10 == 2 ? 2 : 3;
-  }
-
   bool _isOpenNow(String hours) {
     final now = TimeOfDay.now();
     // Simple check: assume open 10am–9pm/10pm
     return now.hour >= 10 && now.hour < 21;
-  }
-
-  void _showTryOnSheet(BuildContext context, Branch branch) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.cardDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('TRY ON IN STORE',
-                style: AppTextStyles.labelLarge
-                    .copyWith(color: AppColors.white)),
-            const SizedBox(height: 8),
-            Text(
-              branch.name,
-              style: AppTextStyles.bodyMedium
-                  .copyWith(color: AppColors.grey400),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Reserve a fitting room and our stylists will have your selected items ready when you arrive.',
-              style: AppTextStyles.bodyMedium
-                  .copyWith(color: AppColors.grey300, height: 1.6),
-            ),
-            const SizedBox(height: 24),
-            GestureDetector(
-              onTap: () => context.push('/booking'),
-              child: Container(
-                height: 52,
-                color: AppColors.accent,
-                alignment: Alignment.center,
-                child: Text(
-                  'BOOK FITTING ROOM',
-                  style: AppTextStyles.labelLarge
-                      .copyWith(color: AppColors.black),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () => Navigator.of(ctx).pop(),
-              child: Container(
-                height: 48,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.grey700),
-                ),
-                child: Text(
-                  'CANCEL',
-                  style: AppTextStyles.labelSmall
-                      .copyWith(color: AppColors.grey500),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -511,118 +425,4 @@ class _ActionBtn extends StatelessWidget {
         ),
       );
 }
-
-// ── Mock map painter ──────────────────────────────────────────────
-class _MockMapPainter extends CustomPainter {
-  final List<Branch> branches;
-  final int selectedIndex;
-
-  _MockMapPainter({required this.branches, required this.selectedIndex});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Dark map background
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFF1A1A2E),
-    );
-
-    final roadPaint = Paint()
-      ..color = const Color(0xFF2A2A3E)
-      ..strokeWidth = 8
-      ..style = PaintingStyle.stroke;
-
-    final roadPaintLight = Paint()
-      ..color = const Color(0xFF333355)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final blockPaint = Paint()
-      ..color = const Color(0xFF151525)
-      ..style = PaintingStyle.fill;
-
-    // Draw city blocks
-    final rng = math.Random(42);
-    for (int i = 0; i < 12; i++) {
-      for (int j = 0; j < 8; j++) {
-        final x = i * (size.width / 11) + rng.nextDouble() * 8;
-        final y = j * (size.height / 7) + rng.nextDouble() * 8;
-        final w = 30 + rng.nextDouble() * 40;
-        final h = 20 + rng.nextDouble() * 30;
-        canvas.drawRect(
-          Rect.fromLTWH(x, y, w, h),
-          blockPaint,
-        );
-      }
-    }
-
-    // Main roads horizontal
-    for (double y in [
-      size.height * 0.2,
-      size.height * 0.45,
-      size.height * 0.7
-    ]) {
-      canvas.drawLine(
-          Offset(0, y), Offset(size.width, y), roadPaint);
-    }
-    // Main roads vertical
-    for (double x in [
-      size.width * 0.25,
-      size.width * 0.5,
-      size.width * 0.75
-    ]) {
-      canvas.drawLine(
-          Offset(x, 0), Offset(x, size.height), roadPaint);
-    }
-    // Secondary roads
-    for (double y in [
-      size.height * 0.32,
-      size.height * 0.58,
-      size.height * 0.83
-    ]) {
-      canvas.drawLine(
-          Offset(0, y), Offset(size.width, y), roadPaintLight);
-    }
-    for (double x in [
-      size.width * 0.12,
-      size.width * 0.37,
-      size.width * 0.62,
-      size.width * 0.87
-    ]) {
-      canvas.drawLine(
-          Offset(x, 0), Offset(x, size.height), roadPaintLight);
-    }
-
-    // User location dot
-    final centerX = size.width * 0.5;
-    final centerY = size.height * 0.6;
-    canvas.drawCircle(
-      Offset(centerX, centerY),
-      10,
-      Paint()
-        ..color = const Color(0xFF4A90D9).withValues(alpha: 0.3)
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(
-      Offset(centerX, centerY),
-      5,
-      Paint()
-        ..color = const Color(0xFF4A90D9)
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(
-      Offset(centerX, centerY),
-      5,
-      Paint()
-        ..color = AppColors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_MockMapPainter old) =>
-      old.selectedIndex != selectedIndex;
-}
-
 // (previously provided an alias) Removed duplicate MapScreen alias.

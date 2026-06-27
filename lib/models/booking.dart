@@ -5,6 +5,7 @@ class Booking {
   final String timeSlot;
   final String name;
   final String email;
+  final String phone;
 
   const Booking({
     this.id,
@@ -13,6 +14,7 @@ class Booking {
     required this.timeSlot,
     required this.name,
     required this.email,
+    this.phone = '',
   });
 
   Map<String, dynamic> toJson() => {
@@ -21,5 +23,6 @@ class Booking {
         'time_slot': timeSlot,
         'name': name,
         'email': email,
+        'phone': phone,
       };
 }

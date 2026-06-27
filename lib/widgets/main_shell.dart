@@ -15,7 +15,7 @@ class MainShell extends ConsumerWidget {
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/search')) return 1;
     if (location.startsWith('/favorites')) return 2;
-    if (location.startsWith('/stylist')) return 3;
+    if (location.startsWith('/booking')) return 3;
     return 0;
   }
 
@@ -29,7 +29,7 @@ class MainShell extends ConsumerWidget {
       case 2:
         context.go('/favorites');
       case 3:
-        context.go('/stylist');
+        context.go('/booking');
     }
   }
 
@@ -66,7 +66,6 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.cardDark,
-        border: Border(top: BorderSide(color: AppColors.grey800, width: 0.5)),
       ),
       child: SafeArea(
         top: false,
@@ -101,9 +100,9 @@ class _BottomNav extends StatelessWidget {
                 onTap: () => onTap(2),
               ),
               _NavItem(
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-                label: 'STYLIST',
+                icon: Icons.calendar_today_outlined,
+                activeIcon: Icons.calendar_today,
+                label: 'BOOKING',
                 selected: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
@@ -181,57 +180,56 @@ class _CartNavItem extends StatelessWidget {
         child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    color: AppColors.accent,
-                    child: const Icon(
+          child: Container(
+            color: AppColors.accent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(
                       Icons.shopping_bag_outlined,
                       color: AppColors.black,
-                      size: 20,
+                      size: 22,
                     ),
-                  ),
-                  if (cartCount > 0)
-                    Positioned(
-                      top: -6,
-                      right: -6,
-                      child: Container(
-                        width: 18,
-                        height: 18,
-                        decoration: const BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          cartCount > 9 ? '9+' : '$cartCount',
-                          style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.black,
-                            fontSize: 9,
+                    if (cartCount > 0)
+                      Positioned(
+                        top: -8,
+                        right: -10,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: const BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            cartCount > 9 ? '9+' : '$cartCount',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.black,
+                              fontSize: 9,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'BAG',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.grey600,
-                  fontSize: 8,
-                  letterSpacing: 0.8,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 2),
-              const SizedBox(height: 1.5), // balance spacing
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  'BAG',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.black,
+                    fontSize: 8,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const SizedBox(height: 1.5),
+              ],
+            ),
           ),
         ),
       );

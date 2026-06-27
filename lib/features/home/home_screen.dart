@@ -59,8 +59,8 @@ class _AppBar extends ConsumerWidget {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.shopping_bag_outlined, color: fg),
-          onPressed: () => context.push('/cart'),
+          icon: Icon(Icons.map_outlined, color: fg),
+          onPressed: () => context.push('/map'),
         ),
       ],
     );
@@ -337,14 +337,16 @@ class _BestsellersSection extends StatelessWidget {
             height: 280,
             child: products.when(
               data: (items) {
-                final capped = items.take(4).toList();
+                const columns = 3;
+                final capped = items.take(columns).toList();
                 if (capped.isEmpty) return const _EmptyProducts();
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     const gap = 8.0;
                     const hPad = 20.0;
                     final cardWidth =
-                        (constraints.maxWidth - hPad * 2 - gap * 3) / 4;
+                        (constraints.maxWidth - hPad * 2 - gap * (columns - 1)) /
+                        columns;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: hPad),
                       child: Row(
@@ -408,14 +410,16 @@ class _NewArrivalsSection extends StatelessWidget {
             height: 280,
             child: products.when(
               data: (items) {
-                final capped = items.take(4).toList();
+                const columns = 3;
+                final capped = items.take(columns).toList();
                 if (capped.isEmpty) return const _EmptyProducts();
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     const gap = 8.0;
                     const hPad = 20.0;
                     final cardWidth =
-                        (constraints.maxWidth - hPad * 2 - gap * 3) / 4;
+                        (constraints.maxWidth - hPad * 2 - gap * (columns - 1)) /
+                        columns;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: hPad),
                       child: Row(

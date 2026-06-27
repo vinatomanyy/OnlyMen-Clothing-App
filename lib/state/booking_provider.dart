@@ -2,15 +2,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/booking.dart';
 import '../data/supabase_repository.dart';
 
+class BookingLogEntry {
+  final String branchName;
+  final String date;
+  final String time;
+  final String status;
+  const BookingLogEntry({
+    required this.branchName,
+    required this.date,
+    required this.time,
+    required this.status,
+  });
+}
+
 class BookingState {
   final String? service;
   final DateTime? date;
   final String? timeSlot;
   final String? name;
   final String? email;
+  final String? phone;
   final bool isLoading;
   final bool isSuccess;
   final String? error;
+  final List<BookingLogEntry> log;
 
   const BookingState({
     this.service,
@@ -18,9 +33,11 @@ class BookingState {
     this.timeSlot,
     this.name,
     this.email,
+    this.phone,
     this.isLoading = false,
     this.isSuccess = false,
     this.error,
+    this.log = const [],
   });
 
   BookingState copyWith({
@@ -29,9 +46,11 @@ class BookingState {
     String? timeSlot,
     String? name,
     String? email,
+    String? phone,
     bool? isLoading,
     bool? isSuccess,
     String? error,
+    List<BookingLogEntry>? log,
   }) =>
       BookingState(
         service: service ?? this.service,
@@ -39,9 +58,11 @@ class BookingState {
         timeSlot: timeSlot ?? this.timeSlot,
         name: name ?? this.name,
         email: email ?? this.email,
+        phone: phone ?? this.phone,
         isLoading: isLoading ?? this.isLoading,
         isSuccess: isSuccess ?? this.isSuccess,
         error: error ?? this.error,
+        log: log ?? this.log,
       );
 }
 
@@ -60,6 +81,12 @@ class BookingNotifier extends Notifier<BookingState> {
 
   void setContactInfo(String name, String email) =>
       state = state.copyWith(name: name, email: email);
+
+  void setPhone(String phone) =>
+      state = state.copyWith(phone: phone);
+
+  void addToLog(BookingLogEntry entry) =>
+      state = state.copyWith(log: [entry, ...state.log]);
 
   Future<void> submit() async {
     if (state.service == null ||

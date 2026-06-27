@@ -24,12 +24,12 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _hasQuery = false;
 
   final List<_CategoryShortcut> _shortcuts = const [
-    _CategoryShortcut(label: 'Jackets', icon: Icons.checkroom_outlined, route: '/category/jackets'),
-    _CategoryShortcut(label: 'Shirts', icon: Icons.dry_cleaning_outlined, route: '/category/shirts'),
-    _CategoryShortcut(label: 'Pants', icon: Icons.straighten_outlined, route: '/category/pants'),
-    _CategoryShortcut(label: 'Shoes', icon: Icons.hiking_outlined, route: '/category/shoes'),
-    _CategoryShortcut(label: 'Accessories', icon: Icons.watch_outlined, route: '/category/accessories'),
+    _CategoryShortcut(label: 'All', icon: Icons.grid_view_outlined, route: '/category/all'),
+    _CategoryShortcut(label: 'Shirts', icon: Icons.checkroom_outlined, route: '/category/shirts'),
     _CategoryShortcut(label: 'T-Shirts', icon: Icons.style_outlined, route: '/category/tshirts'),
+    _CategoryShortcut(label: 'Pants', icon: Icons.straighten_outlined, route: '/category/pants'),
+    _CategoryShortcut(label: 'Jackets', icon: Icons.layers_outlined, route: '/category/jackets'),
+    _CategoryShortcut(label: 'Shoes', icon: Icons.hiking_outlined, route: '/category/shoes'),
   ];
 
   @override
@@ -151,7 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           )
                         : null,
                     filled: true,
-                    fillColor: AppColors.grey900,
+                    fillColor: inputBg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(0),
                       borderSide: BorderSide.none,
@@ -185,6 +185,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final itemText = isDark ? AppColors.grey300 : AppColors.grey800;
     final iconColor = isDark ? AppColors.grey600 : AppColors.grey400;
     final dividerColor = isDark ? AppColors.grey800 : AppColors.grey300;
+    final chipBg = isDark ? AppColors.grey900 : AppColors.grey100;
+    final chipBorder = isDark ? AppColors.grey800 : AppColors.grey300;
 
     return ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -271,7 +273,7 @@ class _SearchScreenState extends State<SearchScreen> {
               'Canvas Sneakers',
               'Leather Belt',
             ]
-                .map((term) => GestureDetector(
+            .map((term) => GestureDetector(
                       onTap: () {
                         _controller.text = term;
                         _controller.selection =
@@ -280,13 +282,19 @@ class _SearchScreenState extends State<SearchScreen> {
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: dividerColor),
+                          horizontal: 14,
+                          vertical: 8,
                         ),
-                        child: Text(term,
-                            style: AppTextStyles.bodySmall.copyWith(
-                                color: itemText)),
+                        decoration: BoxDecoration(
+                          color: chipBg,
+                          border: Border.all(color: chipBorder),
+                        ),
+                        child: Text(
+                          term,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: itemText,
+                          ),
+                        ),
                       ),
                     ))
                 .toList(),
@@ -435,18 +443,30 @@ class _CategoryShortcutCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.grey900,
-            border: Border.all(color: AppColors.grey800),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.grey900
+                : AppColors.white,
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.grey800
+                  : AppColors.grey300,
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(shortcut.icon,
-                  color: AppColors.grey400, size: 20),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.grey400
+                      : AppColors.grey700,
+                  size: 20),
               const SizedBox(height: 6),
               Text(shortcut.label,
                   style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.grey300, fontSize: 10)),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.grey300
+                          : AppColors.grey700,
+                      fontSize: 10)),
             ],
           ),
         ),
